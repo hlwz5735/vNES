@@ -17,6 +17,8 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.audio;
 
+import java.util.Arrays;
+
 public class BlipBuffer {
 
     // These values must be set:
@@ -106,12 +108,8 @@ public class BlipBuffer {
     }
 
     public void clear() {
-
-        for (int i = 0; i < diff.length; i++) {
-            diff[i] = 0;
-        }
+        Arrays.fill(diff, 0);
         lastChanged = 0;
-
     }
 
     public static double sinc(double x) {

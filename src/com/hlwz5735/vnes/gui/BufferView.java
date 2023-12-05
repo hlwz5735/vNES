@@ -22,6 +22,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.VolatileImage;
+import java.util.Arrays;
 import javax.swing.*;
 
 public class BufferView extends JPanel {
@@ -163,12 +164,8 @@ public class BufferView extends JPanel {
 
         }
 
-
         // Set background color:
-        for (int i = 0; i < raster.length; i++) {
-            raster[i] = bgColor;
-        }
-
+        Arrays.fill(raster, bgColor);
 
         // Set component size & bounds:
         setSize(width * scale, height * scale);
@@ -178,8 +175,6 @@ public class BufferView extends JPanel {
         // Repaint component:
         this.invalidate();
         repaint();
-
-
     }
 
     public void imageReady(boolean skipFrame) {

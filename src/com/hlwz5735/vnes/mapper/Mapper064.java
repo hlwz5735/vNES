@@ -212,7 +212,7 @@ public class Mapper064 extends MapperDefault {
 
         if (irq_enabled) {
             if ((scanline >= 0) && (scanline <= 239)) {
-                if ((ppu.scanline & 0x18) != 00) {
+                if ((ppu.scanline & 0x18) != 0) {
                     if (--irq_counter == 0) {
                         irq_counter = irq_latch;
                         return 3;

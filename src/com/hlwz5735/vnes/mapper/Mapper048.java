@@ -130,14 +130,13 @@ public class Mapper048 extends MapperDefault {
 
     public int syncH(int scanline) {
         if (irq_enabled) {
-            if ((ppu.scanline & 0x18) != 00) {
+            if ((ppu.scanline & 0x18) != 0) {
                 if (scanline >= 0 && scanline <= 239) {
                     if (irq_counter == 0) {
                         irq_counter = 0;
                         irq_enabled = false;
 
                         return 3;
-
                     } else {
                         irq_counter++;
                     }

@@ -4,6 +4,7 @@ import com.hlwz5735.vnes.NES;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Memory {
 
@@ -31,7 +32,7 @@ public class Memory {
     }
 
     public void reset() {
-        for (int i = 0; i < mem.length; i++) mem[i] = 0;
+        Arrays.fill(mem, (short) 0);
     }
 
     public int getMemSize() {

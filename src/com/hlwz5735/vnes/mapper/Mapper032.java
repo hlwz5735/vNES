@@ -20,6 +20,7 @@ package com.hlwz5735.vnes.mapper;
 import com.hlwz5735.vnes.NES;
 import com.hlwz5735.vnes.core.CPU;
 import com.hlwz5735.vnes.core.ROM;
+import java.util.Arrays;
 
 public class Mapper032 extends MapperDefault {
 
@@ -132,13 +133,10 @@ public class Mapper032 extends MapperDefault {
     }
 
     public void reset() {
-
         if (patch == 1) {
             nes.getPpu().setMirroring(ROM.SINGLESCREEN_MIRRORING);
         }
 
-        for (int i = 0; i < regs.length; i++) {
-            regs[i] = 0;
-        }
+        Arrays.fill(regs, 0);
     }
 }

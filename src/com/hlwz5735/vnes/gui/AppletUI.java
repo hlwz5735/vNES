@@ -75,7 +75,6 @@ public class AppletUI implements UI {
     }
 
     public void imageReady(boolean skipFrame) {
-
         // Sound stuff:
         int tmp = nes.getPapu().getBufferIndex();
         if (Globals.enableSound && Globals.timeEmulation && tmp > 0) {

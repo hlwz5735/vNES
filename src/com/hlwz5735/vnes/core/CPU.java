@@ -268,16 +268,10 @@ public final class CPU implements Runnable {
         boolean asApplet = Globals.appletMode;
         stopRunning = false;
 
-        while (true) {
-
-
-            if (stopRunning) break;
-
+        while (!stopRunning) {
             // Check interrupts:
             if (irqRequested) {
-
-                temp =
-                        (F_CARRY) |
+                temp = (F_CARRY) |
                                 ((F_ZERO == 0 ? 1 : 0) << 1) |
                                 (F_INTERRUPT << 2) |
                                 (F_DECIMAL << 3) |
@@ -290,7 +284,6 @@ public final class CPU implements Runnable {
                 F_INTERRUPT_NEW = F_INTERRUPT;
                 switch (irqType) {
                     case 0: {
-
                         // Normal IRQ:
                         if (F_INTERRUPT != 0) {
                             ////System.out.println("Interrupt was masked.");
@@ -299,21 +292,16 @@ public final class CPU implements Runnable {
                         doIrq(temp);
                         ////System.out.println("Did normal IRQ. I="+F_INTERRUPT);
                         break;
-
                     }
                     case 1: {
-
                         // NMI:
                         doNonMaskableInterrupt(temp);
                         break;
-
                     }
                     case 2: {
-
                         // Reset:
                         doResetInterrupt();
                         break;
-
                     }
                 }
 
@@ -338,17 +326,12 @@ public final class CPU implements Runnable {
 
             switch (addrMode) {
                 case 0: {
-
                     // Zero Page mode. Use the address given after the opcode, but without high byte.
-
                     addr = load(opaddr + 2);
                     break;
-
                 }
                 case 1: {
-
                     // Relative mode.
-
                     addr = load(opaddr + 2);
                     if (addr < 0x80) {
                         addr += REG_PC;
@@ -356,58 +339,44 @@ public final class CPU implements Runnable {
                         addr += REG_PC - 256;
                     }
                     break;
-
                 }
                 case 2: {
-
                     // Ignore. Address is implied in instruction.
                     break;
-
                 }
                 case 3: {
-
                     // Absolute mode. Use the two bytes following the opcode as an address.
 
                     addr = load16bit(opaddr + 2);
                     break;
-
                 }
                 case 4: {
-
                     // Accumulator mode. The address is in the accumulator register.
 
                     addr = REG_ACC;
                     break;
-
                 }
                 case 5: {
-
                     // Immediate mode. The value is given after the opcode.
 
                     addr = REG_PC;
                     break;
-
                 }
                 case 6: {
-
                     // Zero Page Indexed mode, X as index. Use the address given after the opcode, then add the
                     // X register to it to get the final address.
 
                     addr = (load(opaddr + 2) + REG_X) & 0xFF;
                     break;
-
                 }
                 case 7: {
-
                     // Zero Page Indexed mode, Y as index. Use the address given after the opcode, then add the
                     // Y register to it to get the final address.
 
                     addr = (load(opaddr + 2) + REG_Y) & 0xFF;
                     break;
-
                 }
                 case 8: {
-
                     // Absolute Indexed Mode, X as index. Same as zero page indexed, but with the high byte.
 
                     addr = load16bit(opaddr + 2);
@@ -416,10 +385,8 @@ public final class CPU implements Runnable {
                     }
                     addr += REG_X;
                     break;
-
                 }
                 case 9: {
-
                     // Absolute Indexed Mode, Y as index. Same as zero page indexed, but with the high byte.
 
                     addr = load16bit(opaddr + 2);
@@ -428,10 +395,8 @@ public final class CPU implements Runnable {
                     }
                     addr += REG_Y;
                     break;
-
                 }
                 case 10: {
-
                     // Pre-indexed Indirect mode. Find the 16-bit address starting at the given location plus
                     // the current X register. The value is the contents of that address.
 
@@ -443,10 +408,8 @@ public final class CPU implements Runnable {
                     addr &= 0xFF;
                     addr = load16bit(addr);
                     break;
-
                 }
                 case 11: {
-
                     // Post-indexed Indirect mode. Find the 16-bit address contained in the given location
                     // (and the one following). Add to that address the contents of the Y register. Fetch the value
                     // stored at that adress.
@@ -457,10 +420,8 @@ public final class CPU implements Runnable {
                     }
                     addr += REG_Y;
                     break;
-
                 }
                 case 12: {
-
                     // Indirect Absolute mode. Find the 16-bit address contained at the given location.
 
                     addr = load16bit(opaddr + 2);// Find op
@@ -470,7 +431,6 @@ public final class CPU implements Runnable {
                         addr = mmap.load(addr) + (mmap.load((addr & 0xFF00) | (((addr & 0xFF) + 1) & 0xFF)) << 8);
                     }
                     break;
-
                 }
 
             }

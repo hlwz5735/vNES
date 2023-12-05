@@ -20,6 +20,7 @@ package com.hlwz5735.vnes.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -110,9 +111,7 @@ public class ByteBuffer {
     }
 
     public void clear() {
-        for (int i = 0; i < buf.length; i++) {
-            buf[i] = 0;
-        }
+        Arrays.fill(buf, (short) 0);
         curPos = 0;
     }
 
@@ -409,15 +408,15 @@ public class ByteBuffer {
             resize(curPos + arr.length * 2);
         }
         if (byteOrder == BO_BIG_ENDIAN) {
-            for (int i = 0; i < arr.length; i++) {
-                buf[curPos] = (short) ((arr[i] >> 8) & 255);
-                buf[curPos + 1] = (short) ((arr[i]) & 255);
+            for (short value : arr) {
+                buf[curPos] = (short) ((value >> 8) & 255);
+                buf[curPos + 1] = (short) (value & 255);
                 curPos += 2;
             }
         } else {
-            for (int i = 0; i < arr.length; i++) {
-                buf[curPos + 1] = (short) ((arr[i] >> 8) & 255);
-                buf[curPos] = (short) ((arr[i]) & 255);
+            for (short value : arr) {
+                buf[curPos + 1] = (short) ((value >> 8) & 255);
+                buf[curPos] = (short) (value & 255);
                 curPos += 2;
             }
         }
@@ -425,7 +424,7 @@ public class ByteBuffer {
     }
 
     public String toString() {
-        StringBuffer strBuf = new StringBuffer();
+        StringBuilder strBuf = new StringBuilder();
         short tmp;
         for (int i = 0; i < (size - 1); i += 2) {
             tmp = (short) ((buf[i] << 8) | (buf[i + 1]));
@@ -435,7 +434,7 @@ public class ByteBuffer {
     }
 
     public String toStringAscii() {
-        StringBuffer strBuf = new StringBuffer();
+        StringBuilder strBuf = new StringBuilder();
         for (int i = 0; i < size; i++) {
             strBuf.append((char) (buf[i]));
         }
@@ -654,9 +653,9 @@ public class ByteBuffer {
 
         int encpos = 0;
         int tmp;
-        for (int i = 0; i < data.length; i++) {
+        for (short datum : data) {
 
-            tmp = data[i];
+            tmp = datum;
             enc[encpos] = (byte) (65 + (tmp) & 0xF);
             enc[encpos + 1] = (byte) (65 + (tmp >> 4) & 0xF);
             encpos += 2;

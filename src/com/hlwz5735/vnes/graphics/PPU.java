@@ -25,6 +25,7 @@ import com.hlwz5735.vnes.core.HiResTimer;
 import com.hlwz5735.vnes.core.Memory;
 import com.hlwz5735.vnes.core.ROM;
 import com.hlwz5735.vnes.gui.BufferView;
+import java.util.Arrays;
 
 public class PPU {
 
@@ -202,9 +203,7 @@ public class PPU {
         curX = 0;
 
         // Initialize old frame buffer:
-        for (int i = 0; i < oldFrame.length; i++) {
-            oldFrame[i] = -1;
-        }
+        Arrays.fill(oldFrame, -1);
 
     }
 
@@ -533,13 +532,8 @@ public class PPU {
 
         }
 
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = bgColor;
-        }
-        for (int i = 0; i < pixrendered.length; i++) {
-            pixrendered[i] = 65;
-        }
-
+        Arrays.fill(buffer, bgColor);
+        Arrays.fill(pixrendered, 65);
     }
 
     public void endFrame() {

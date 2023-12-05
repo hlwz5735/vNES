@@ -29,7 +29,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class FileLoader {
-
     // Load a file.
     public short[] loadFile(String fileName, UI ui) {
         int flen;
@@ -51,8 +50,6 @@ public class FileLoader {
             int readbyte = 0;
 
             if (!(in instanceof FileInputStream)) {
-
-
                 long total = -1;
 
                 if (fileName.endsWith(".zip")) {
@@ -83,11 +80,8 @@ public class FileLoader {
                             ui.showLoadProgress((int) progress);
                         }
                     }
-
                 }
-
             } else {
-
                 // This is easy, can find the file size since it's
                 // in the local file system.
                 File f = new File(fileName);
@@ -98,7 +92,6 @@ public class FileLoader {
                     count += in.read(tmp, count, total - count);
                 }
                 pos = total;
-
             }
 
             // Put into array without any padding:
@@ -110,11 +103,9 @@ public class FileLoader {
             flen = tmp.length;
 
         } catch (IOException ioe) {
-
             // Something went wrong.
             ioe.printStackTrace();
             return null;
-
         }
 
         short[] ret = new short[flen];

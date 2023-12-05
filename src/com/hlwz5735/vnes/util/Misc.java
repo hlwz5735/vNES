@@ -34,19 +34,19 @@ public class Misc {
     }
 
     public static String hex8(int i) {
-        String s = Integer.toHexString(i);
+        StringBuilder s = new StringBuilder(Integer.toHexString(i));
         while (s.length() < 2) {
-            s = "0" + s;
+            s.insert(0, "0");
         }
-        return s.toUpperCase();
+        return s.toString().toUpperCase();
     }
 
     public static String hex16(int i) {
-        String s = Integer.toHexString(i);
+        StringBuilder s = new StringBuilder(Integer.toHexString(i));
         while (s.length() < 4) {
-            s = "0" + s;
+            s.insert(0, "0");
         }
-        return s.toUpperCase();
+        return s.toString().toUpperCase();
     }
 
     public static String binN(int num, int N) {
@@ -83,9 +83,11 @@ public class Misc {
     }
 
     public static String pad(String str, String padStr, int length) {
-        while (str.length() < length) {
-            str += padStr;
+        StringBuilder strBuilder = new StringBuilder(str);
+        while (strBuilder.length() < length) {
+            strBuilder.append(padStr);
         }
+        str = strBuilder.toString();
         return str;
     }
 

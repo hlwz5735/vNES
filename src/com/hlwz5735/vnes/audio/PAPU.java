@@ -925,7 +925,6 @@ public final class PAPU {
     }
 
     public int getMillisToAvailableAbove(int target_avail) {
-
         double time;
         int cur_avail;
         if ((cur_avail = line.available()) >= target_avail) {
@@ -936,7 +935,6 @@ public final class PAPU {
         time /= (stereo ? 4 : 2);
 
         return (int) time;
-
     }
 
     public int getBufferPos() {

@@ -45,10 +45,16 @@ public class PaletteTable {
     public boolean loadPalette(String file) {
         int r, g, b;
 
-        try {
+        try(InputStream fStr = ClassLoader.getSystemResourceAsStream(file)) {
+            if (fStr == null) {
+                // Unable to load palette.
+                System.out.println("PaletteTable: Internal Palette Loaded.");
+                loadDefaultPalette();
+                return false;
+            }
+
             if (file.toLowerCase().endsWith("pal")) {
                 // Read binary palette file.
-                InputStream fStr = getClass().getResourceAsStream(file);
                 byte[] tmp = new byte[64 * 3];
 
                 int n = 0;
@@ -69,7 +75,6 @@ public class PaletteTable {
                 }
             } else {
                 // Read text file with hex codes.
-                InputStream fStr = ClassLoader.getSystemResourceAsStream(file);
                 InputStreamReader isr = new InputStreamReader(fStr);
                 BufferedReader br = new BufferedReader(isr);
 
@@ -82,9 +87,9 @@ public class PaletteTable {
                         hexG = line.substring(3, 5);
                         hexB = line.substring(5, 7);
 
-                        r = Integer.decode("0x" + hexR).intValue();
-                        g = Integer.decode("0x" + hexG).intValue();
-                        b = Integer.decode("0x" + hexB).intValue();
+                        r = Integer.decode("0x" + hexR);
+                        g = Integer.decode("0x" + hexG);
+                        b = Integer.decode("0x" + hexB);
                         origTable[palIndex] = r | (g << 8) | (b << 16);
 
                         palIndex++;
@@ -100,7 +105,6 @@ public class PaletteTable {
 
             return true;
         } catch (Exception e) {
-
             // Unable to load palette.
             System.out.println("PaletteTable: Internal Palette Loaded.");
             loadDefaultPalette();
@@ -159,7 +163,7 @@ public class PaletteTable {
     public int RGBtoHSL(int r, int g, int b) {
         float[] hsbvals = new float[3];
         hsbvals = Color.RGBtoHSB(b, g, r, hsbvals);
-        hsbvals[0] -= Math.floor(hsbvals[0]);
+        hsbvals[0] -= (float) Math.floor(hsbvals[0]);
 
         int ret = 0;
         ret |= (((int) (hsbvals[0] * 255d)) << 16);

@@ -105,7 +105,7 @@ public class vNES extends JPanel implements Runnable {
         started = true;
 
         // Load ROM file:
-        System.out.println("vNES 2.16 \u00A9 2006-2013 Open Emulation Project");
+        System.out.println("vNES 2.16 © 2006-2013 Open Emulation Project");
         System.out.println("For updates, visit www.openemulation.com");
         System.out.println("Use of this program subject to GNU GPL, Version 3.");
 
@@ -211,7 +211,7 @@ public class vNES extends JPanel implements Runnable {
         g.setColor(Color.white);
         g.drawString(disp, scrw / 2 - txtw / 2, scrh / 2 - txth / 2);
         g.drawString(disp, scrw / 2 - txtw / 2, scrh / 2 - txth / 2);
-        g.drawString("vNES \u00A9 2006-2013 Open Emulation Project", 12, 464);
+        g.drawString("vNES © 2006-2013 Open Emulation Project", 12, 464);
     }
 
     public void update(Graphics g) {
