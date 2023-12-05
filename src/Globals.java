@@ -22,7 +22,7 @@ public class Globals {
     public static double CPU_FREQ_NTSC = 1789772.5d;
     public static double CPU_FREQ_PAL = 1773447.4d;
     public static int preferredFrameRate = 60;
-    
+
     // Microseconds per frame:
     public static int frameTime = 1000000 / preferredFrameRate;
     // What value to flush memory with on power-up:
@@ -38,8 +38,8 @@ public class Globals {
     public static boolean enableSound = true;
     public static boolean focused = false;
 
-    public static HashMap keycodes = new HashMap(); //Java key codes
-    public static HashMap controls = new HashMap(); //vNES controls codes
+    public static HashMap<String, Integer> keycodes = new HashMap<>(); //Java key codes
+    public static HashMap<String, String> controls = new HashMap<>(); //vNES controls codes
 
     public static NES nes;
 

@@ -15,10 +15,10 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.applet.*;
 import java.awt.*;
+import javax.swing.*;
 
-public class vNES extends Applet implements Runnable {
+public class vNES extends JPanel implements Runnable {
 
     boolean scale;
     boolean scanlines;
@@ -95,7 +95,7 @@ public class vNES extends Applet implements Runnable {
     public void run() {
 
         // Set font to be used for progress display of loading:
-        progressFont = new Font("Tahoma", Font.TRUETYPE_FONT | Font.BOLD, 12);
+        progressFont = new Font("Jetbrains Mono", Font.BOLD, 12);
 
         // Can start painting:
         started = true;
@@ -138,11 +138,10 @@ public class vNES extends Applet implements Runnable {
     }
 
     public void destroy() {
-
         if (nes != null && nes.getCpu().isRunning()) {
             stop();
         }
-        
+
         if (nes != null) {
             nes.destroy();
         }
@@ -157,19 +156,15 @@ public class vNES extends Applet implements Runnable {
 
         System.runFinalization();
         System.gc();
-
     }
 
     public void showLoadProgress(int percentComplete) {
-
         progress = percentComplete;
         paint(getGraphics());
-
     }
 
     // Show the progress graphically.
     public void paint(Graphics g) {
-
         String pad;
         String disp;
         int scrw, scrh;
@@ -220,60 +215,60 @@ public class vNES extends Applet implements Runnable {
     }
 
     public void readParams() {
-
         String tmp;
 
         tmp = getParameter("rom");
-        if (tmp == null || tmp.equals("")) {
-            rom = "vnes.nes";
+        if (tmp == null || tmp.isEmpty()) {
+            // rom = "vnes.nes";
+            rom = "chess.nes";
         } else {
             rom = tmp;
         }
 
         tmp = getParameter("scale");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             scale = false;
         } else {
             scale = tmp.equals("on");
         }
 
         tmp = getParameter("sound");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             sound = true;
         } else {
             sound = tmp.equals("on");
         }
 
         tmp = getParameter("stereo");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             stereo = true; // on by default
         } else {
             stereo = tmp.equals("on");
         }
 
         tmp = getParameter("scanlines");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             scanlines = false;
         } else {
             scanlines = tmp.equals("on");
         }
 
         tmp = getParameter("fps");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             fps = false;
         } else {
             fps = tmp.equals("on");
         }
 
         tmp = getParameter("timeemulation");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             timeemulation = true;
         } else {
             timeemulation = tmp.equals("on");
         }
 
         tmp = getParameter("showsoundbuffer");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             showsoundbuffer = false;
         } else {
             showsoundbuffer = tmp.equals("on");
@@ -282,49 +277,49 @@ public class vNES extends Applet implements Runnable {
         /* Controller Setup for Player 1 */
 
         tmp = getParameter("p1_up");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p1_up", "VK_UP");
         } else {
             Globals.controls.put("p1_up", "VK_" + tmp);
         }
         tmp = getParameter("p1_down");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p1_down", "VK_DOWN");
         } else {
             Globals.controls.put("p1_down", "VK_" + tmp);
         }
         tmp = getParameter("p1_left");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p1_left", "VK_LEFT");
         } else {
             Globals.controls.put("p1_left", "VK_" + tmp);
         }
         tmp = getParameter("p1_right");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p1_right", "VK_RIGHT");
         } else {
             Globals.controls.put("p1_right", "VK_" + tmp);
         }
         tmp = getParameter("p1_a");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p1_a", "VK_X");
         } else {
             Globals.controls.put("p1_a", "VK_" + tmp);
         }
         tmp = getParameter("p1_b");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p1_b", "VK_Z");
         } else {
             Globals.controls.put("p1_b", "VK_" + tmp);
         }
         tmp = getParameter("p1_start");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p1_start", "VK_ENTER");
         } else {
             Globals.controls.put("p1_start", "VK_" + tmp);
         }
         tmp = getParameter("p1_select");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p1_select", "VK_CONTROL");
         } else {
             Globals.controls.put("p1_select", "VK_" + tmp);
@@ -333,56 +328,56 @@ public class vNES extends Applet implements Runnable {
         /* Controller Setup for Player 2 */
 
         tmp = getParameter("p2_up");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p2_up", "VK_NUMPAD8");
         } else {
             Globals.controls.put("p2_up", "VK_" + tmp);
         }
         tmp = getParameter("p2_down");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p2_down", "VK_NUMPAD2");
         } else {
             Globals.controls.put("p2_down", "VK_" + tmp);
         }
         tmp = getParameter("p2_left");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p2_left", "VK_NUMPAD4");
         } else {
             Globals.controls.put("p2_left", "VK_" + tmp);
         }
         tmp = getParameter("p2_right");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p2_right", "VK_NUMPAD6");
         } else {
             Globals.controls.put("p2_right", "VK_" + tmp);
         }
         tmp = getParameter("p2_a");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p2_a", "VK_NUMPAD7");
         } else {
             Globals.controls.put("p2_a", "VK_" + tmp);
         }
         tmp = getParameter("p2_b");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p2_b", "VK_NUMPAD9");
         } else {
             Globals.controls.put("p2_b", "VK_" + tmp);
         }
         tmp = getParameter("p2_start");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p2_start", "VK_NUMPAD1");
         } else {
             Globals.controls.put("p2_start", "VK_" + tmp);
         }
         tmp = getParameter("p2_select");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p2_select", "VK_NUMPAD3");
         } else {
             Globals.controls.put("p2_select", "VK_" + tmp);
         }
 
         tmp = getParameter("romsize");
-        if (tmp == null || tmp.equals("")) {
+        if (tmp == null || tmp.isEmpty()) {
             romSize = -1;
         } else {
             try {
@@ -473,5 +468,9 @@ public class vNES extends Applet implements Runnable {
         Globals.keycodes.put("VK_MINUS", 45);
         Globals.keycodes.put("VK_PERIOD", 46);
         Globals.keycodes.put("VK_SLASH", 47);
+    }
+
+    private String getParameter(String pName) {
+        return null;
     }
 }
