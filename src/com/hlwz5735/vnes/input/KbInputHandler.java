@@ -20,31 +20,50 @@ package com.hlwz5735.vnes.input;
 import com.hlwz5735.vnes.core.Nes;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Arrays;
 
 public class KbInputHandler implements KeyListener, InputHandler {
+    /** 控制器的ID，主手柄是0 */
+    private final int id;
 
-    boolean[] allKeysState;
-    int[] keyMapping;
-    int id;
-    Nes nes;
+    private final Nes nes;
+
+    /** 保存所有键盘按键状态的数组，最多支持255个按键编码（够用了） */
+    private final boolean[] allKeysState = new boolean[255];
+
+    /** 手柄按钮ID到键盘按键编码的映射表 */
+    private final int[] keyMapping = new int[NUM_KEYS];
 
     public KbInputHandler(Nes nes, int id) {
         this.nes = nes;
         this.id = id;
-        allKeysState = new boolean[255];
-        keyMapping = new int[InputHandler.NUM_KEYS];
     }
 
+    @Override
     public short getKeyState(int padKey) {
         return (short) (allKeysState[keyMapping[padKey]] ? 0x41 : 0x40);
     }
 
+    @Override
     public void mapKey(int padKey, int kbKeycode) {
         keyMapping[padKey] = kbKeycode;
     }
 
-    public void keyPressed(KeyEvent ke) {
+    @Override
+    public void reset() {
+        Arrays.fill(this.allKeysState, false);
+    }
 
+    @Override
+    public void update() {
+        // doesn't do anything.
+    }
+
+    public void destroy() {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent ke) {
         int kc = ke.getKeyCode();
         if (kc >= allKeysState.length) {
             return;
@@ -64,8 +83,8 @@ public class KbInputHandler implements KeyListener, InputHandler {
         }
     }
 
+    @Override
     public void keyReleased(KeyEvent ke) {
-
         int kc = ke.getKeyCode();
         if (kc >= allKeysState.length) {
             return;
@@ -73,36 +92,19 @@ public class KbInputHandler implements KeyListener, InputHandler {
 
         allKeysState[kc] = false;
 
-        if (id == 0) {
-            switch (kc) {
-                case KeyEvent.VK_F5: {
-                    // Reset game:
-                    if (nes.isRunning()) {
-                        nes.stopEmulation();
-                        nes.reset();
-                        nes.reloadRom();
-                        nes.startEmulation();
-                    }
-                    break;
-                }
+        // 主手柄的复位键按下
+        if (id == 0 && kc == KeyEvent.VK_F5) {
+            if (nes.isRunning()) {
+                nes.stopEmulation();
+                nes.reset();
+                nes.reloadRom();
+                nes.startEmulation();
             }
         }
     }
 
+    @Override
     public void keyTyped(KeyEvent ke) {
         // Ignore.
     }
-
-    public void reset() {
-        allKeysState = new boolean[255];
-    }
-
-    public void update() {
-        // doesn't do anything.
-    }
-
-    public void destroy() {
-        nes = null;
-    }
-
 }

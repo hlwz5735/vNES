@@ -29,14 +29,22 @@ public interface InputHandler {
     int KEY_LEFT = 6;
     int KEY_RIGHT = 7;
 
-    // Key count:
+    /** 一个控制器的按键总数量 */
     int NUM_KEYS = 8;
 
+    /**
+     * 获取某个按键的状态信息
+     * @param padKey 按键的Key
+     * @return 按键状态 0x41 代表按下，0x40 代表未按下
+     */
     short getKeyState(int padKey);
 
+    /** 将控制器按键Key和物理键盘的按键Key绑定起来 */
     void mapKey(int padKey, int deviceKey);
 
+    /** 复位所有按键状态 */
     void reset();
 
+    /** 更新按键状态 */
     void update();
 }
