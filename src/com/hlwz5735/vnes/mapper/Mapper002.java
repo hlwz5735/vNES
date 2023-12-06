@@ -17,13 +17,13 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Nes;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper002 extends MapperDefault {
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
 
         super.init(nes);
 
@@ -46,7 +46,7 @@ public class Mapper002 extends MapperDefault {
 
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         if (!rom.isValid()) {
             // System.out.println("UNROM: Invalid ROM! Unable to load.");
@@ -64,7 +64,7 @@ public class Mapper002 extends MapperDefault {
 
         // Do Reset-Interrupt:
         // nes.getCpu().doResetInterrupt();
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
 
     }
 }

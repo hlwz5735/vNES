@@ -17,7 +17,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.input;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -26,9 +26,9 @@ public class KbInputHandler implements KeyListener, InputHandler {
     boolean[] allKeysState;
     int[] keyMapping;
     int id;
-    NES nes;
+    Nes nes;
 
-    public KbInputHandler(NES nes, int id) {
+    public KbInputHandler(Nes nes, int id) {
         this.nes = nes;
         this.id = id;
         allKeysState = new boolean[255];

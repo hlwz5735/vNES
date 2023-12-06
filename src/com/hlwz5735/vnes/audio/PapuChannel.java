@@ -17,15 +17,27 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.audio;
 
+/**
+ * 代表一个音频通道
+ */
 public interface PapuChannel {
 
+    /**
+     * 写入寄存器
+     * @param address 地址
+     * @param value 值
+     */
     void writeReg(int address, int value);
 
+    /** 设置是否启用此通道 */
     void setEnabled(boolean value);
 
+    /** 获取是否启用此通道 */
     boolean isEnabled();
 
+    /** 通道复位 */
     void reset();
 
+    /** 获取通道长度状态 */
     int getLengthStatus();
 }

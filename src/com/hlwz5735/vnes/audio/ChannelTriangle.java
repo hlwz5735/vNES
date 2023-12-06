@@ -19,7 +19,7 @@ package com.hlwz5735.vnes.audio;
 
 public class ChannelTriangle implements PapuChannel {
 
-    PAPU papu;
+    Papu papu;
     boolean isEnabled;
     boolean sampleCondition;
     boolean lengthCounterEnable;
@@ -34,7 +34,7 @@ public class ChannelTriangle implements PapuChannel {
     int sampleValue;
     int tmp;
 
-    public ChannelTriangle(PAPU papu) {
+    public ChannelTriangle(Papu papu) {
         this.papu = papu;
     }
 
@@ -48,28 +48,20 @@ public class ChannelTriangle implements PapuChannel {
     }
 
     public void clockLinearCounter() {
-
         if (lcHalt) {
-
             // Load:
             linearCounter = lcLoadValue;
             updateSampleCondition();
-
         } else if (linearCounter > 0) {
-
             // Decrement:
             linearCounter--;
             updateSampleCondition();
-
         }
 
         if (!lcControl) {
-
             // Clear halt flag:
             lcHalt = false;
-
         }
-
     }
 
     public int getLengthStatus() {
@@ -81,38 +73,27 @@ public class ChannelTriangle implements PapuChannel {
     }
 
     public void writeReg(int address, int value) {
-
         if (address == 0x4008) {
-
             // New values for linear counter:
             lcControl = (value & 0x80) != 0;
             lcLoadValue = value & 0x7F;
-
             // Length counter enable:
             lengthCounterEnable = !lcControl;
-
         } else if (address == 0x400A) {
-
             // Programmable timer:
             progTimerMax &= 0x700;
             progTimerMax |= value;
-
         } else if (address == 0x400B) {
-
             // Programmable timer, length counter
             progTimerMax &= 0xFF;
             progTimerMax |= ((value & 0x07) << 8);
             lengthCounter = papu.getLengthMax(value & 0xF8);
             lcHalt = true;
-
         }
-
         updateSampleCondition();
-
     }
 
     public void clockProgrammableTimer(int nCycles) {
-
         if (progTimerMax > 0) {
             progTimerCount += nCycles;
             while (progTimerMax > 0 && progTimerCount >= progTimerMax) {
@@ -122,7 +103,6 @@ public class ChannelTriangle implements PapuChannel {
                 }
             }
         }
-
     }
 
     public void clockTriangleGenerator() {
@@ -143,15 +123,13 @@ public class ChannelTriangle implements PapuChannel {
     }
 
     public void updateSampleCondition() {
-        sampleCondition =
-                isEnabled &&
+        sampleCondition = isEnabled &&
                         progTimerMax > 7 &&
                         linearCounter > 0 &&
                         lengthCounter > 0;
     }
 
     public void reset() {
-
         progTimerCount = 0;
         progTimerMax = 0;
         triangleCounter = 0;
@@ -165,7 +143,6 @@ public class ChannelTriangle implements PapuChannel {
         lcControl = false;
         tmp = 0;
         sampleValue = 0xF;
-
     }
 
     public void destroy() {

@@ -17,10 +17,10 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.core.ByteBuffer;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper004 extends MapperDefault {
 
@@ -41,7 +41,7 @@ public class Mapper004 extends MapperDefault {
     int irqEnable;
     boolean prgAddressChanged = false;
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
 
         super.init(nes);
 
@@ -116,9 +116,9 @@ public class Mapper004 extends MapperDefault {
 
             // Mirroring select
             if ((value & 1) != 0) {
-                nes.getPpu().setMirroring(ROM.HORIZONTAL_MIRRORING);
+                nes.getPpu().setMirroring(Rom.HORIZONTAL_MIRRORING);
             } else {
-                nes.getPpu().setMirroring(ROM.VERTICAL_MIRRORING);
+                nes.getPpu().setMirroring(Rom.VERTICAL_MIRRORING);
             }
 
         } else if (address == 0xA001) {
@@ -264,7 +264,7 @@ public class Mapper004 extends MapperDefault {
 
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         // System.out.println("Loading ROM.");
 
@@ -289,7 +289,7 @@ public class Mapper004 extends MapperDefault {
 
         // Do Reset-Interrupt:
         // nes.getCpu().doResetInterrupt();
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
 
     }
 
@@ -301,7 +301,7 @@ public class Mapper004 extends MapperDefault {
 
                 // Trigger IRQ:
                 // nes.getCpu().doIrq();
-                nes.getCpu().requestIrq(CPU.IRQ_NORMAL);
+                nes.getCpu().requestIrq(Cpu.IRQ_NORMAL);
                 irqCounter = irqLatchValue;
 
             }

@@ -17,15 +17,15 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Nes;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper075 extends MapperDefault {
 
     int[] regs = new int[2];
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
         super.init(nes);
     }
 
@@ -42,9 +42,9 @@ public class Mapper075 extends MapperDefault {
 
                 case 0x9000: {
                     if ((value & 0x01) != 0) {
-                        nes.getPpu().setMirroring(ROM.HORIZONTAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.HORIZONTAL_MIRRORING);
                     } else {
-                        nes.getPpu().setMirroring(ROM.VERTICAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.VERTICAL_MIRRORING);
                     }
 
                     regs[0] = (regs[0] & 0x0F) | ((value & 0x02) << 3);
@@ -81,7 +81,7 @@ public class Mapper075 extends MapperDefault {
         }
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         int num_8k_banks = rom.getRomBankCount() * 2;
 
@@ -95,7 +95,7 @@ public class Mapper075 extends MapperDefault {
         loadCHRROM();
 
         // Do Reset-Interrupt:
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
 
     }
 

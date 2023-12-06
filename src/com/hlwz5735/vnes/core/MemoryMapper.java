@@ -17,13 +17,11 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.core;
 
-import com.hlwz5735.vnes.NES;
-
 public interface MemoryMapper {
 
-    void init(NES nes);
+    void init(Nes nes);
 
-    void loadROM(ROM rom);
+    void loadROM(Rom rom);
 
     void write(int address, short value);
 

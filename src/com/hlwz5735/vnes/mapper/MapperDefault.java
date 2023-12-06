@@ -17,25 +17,25 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.core.ByteBuffer;
-import com.hlwz5735.vnes.core.CPU;
+import com.hlwz5735.vnes.core.Cpu;
 import com.hlwz5735.vnes.core.Memory;
 import com.hlwz5735.vnes.core.MemoryMapper;
-import com.hlwz5735.vnes.core.ROM;
-import com.hlwz5735.vnes.graphics.PPU;
+import com.hlwz5735.vnes.core.Rom;
+import com.hlwz5735.vnes.graphics.Ppu;
 import com.hlwz5735.vnes.graphics.Tile;
 import com.hlwz5735.vnes.input.InputHandler;
 
 public class MapperDefault implements MemoryMapper {
 
-    public NES nes;
+    public Nes nes;
     public Memory cpuMem;
     public Memory ppuMem;
     public short[] cpuMemArray;
-    public ROM rom;
-    public CPU cpu;
-    public PPU ppu;
+    public Rom rom;
+    public Cpu cpu;
+    public Ppu ppu;
     public int cpuMemSize;
     public int joy1StrobeState;
     public int joy2StrobeState;
@@ -46,7 +46,7 @@ public class MapperDefault implements MemoryMapper {
     public int mouseY;
     int tmp;
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
 
         this.nes = nes;
         this.cpuMem = nes.getCpuMemory();
@@ -436,7 +436,7 @@ public class MapperDefault implements MemoryMapper {
 
     public short joy1Read() {
 
-        InputHandler in = nes.getGui().getJoy1();
+        InputHandler in = nes.getManager().getJoy1();
         short ret;
 
         switch (joy1StrobeState) {
@@ -494,7 +494,7 @@ public class MapperDefault implements MemoryMapper {
     }
 
     public short joy2Read() {
-        InputHandler in = nes.getGui().getJoy2();
+        InputHandler in = nes.getManager().getJoy2();
         int st = joy2StrobeState;
 
         joy2StrobeState++;
@@ -531,7 +531,7 @@ public class MapperDefault implements MemoryMapper {
         }
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         if (!rom.isValid() || rom.getRomBankCount() < 1) {
             // System.out.println("NoMapper: Invalid ROM! Unable to load.");
@@ -549,7 +549,7 @@ public class MapperDefault implements MemoryMapper {
 
         // Reset IRQ:
         // nes.getCpu().doResetInterrupt();
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
 
     }
 

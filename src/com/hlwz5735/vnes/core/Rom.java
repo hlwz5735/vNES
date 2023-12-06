@@ -17,7 +17,6 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.core;
 
-import com.hlwz5735.vnes.NES;
 import com.hlwz5735.vnes.graphics.Tile;
 import com.hlwz5735.vnes.mapper.Mapper001;
 import com.hlwz5735.vnes.mapper.Mapper002;
@@ -54,7 +53,7 @@ import com.hlwz5735.vnes.util.FileLoader;
 import java.io.File;
 import java.io.RandomAccessFile;
 
-public class ROM {
+public class Rom {
 
     // Mirroring types:
     public static final int VERTICAL_MIRRORING = 0;
@@ -72,7 +71,7 @@ public class ROM {
     short[][] vrom;
     short[] saveRam;
     Tile[][] vromTile;
-    NES nes;
+    Nes nes;
     int romCount;
     int vromCount;
     int mirroring;
@@ -208,7 +207,7 @@ public class ROM {
         mapperSupported[232] = true; // Camerica /Quattro
     }
 
-    public ROM(NES nes) {
+    public Rom(Nes nes) {
         this.nes = nes;
         valid = false;
     }
@@ -217,12 +216,12 @@ public class ROM {
 
         this.fileName = fileName;
         FileLoader loader = new FileLoader();
-        short[] b = loader.loadFile(fileName, nes.getGui());
+        short[] b = loader.loadFile(fileName, nes.getManager());
 
         if (b == null || b.length == 0) {
 
             // Unable to load file.
-            nes.gui.showErrorMsg("Unable to load ROM file.");
+            nes.manager.showErrorMsg("Unable to load ROM file.");
             valid = false;
 
         }
@@ -520,7 +519,7 @@ public class ROM {
         }
 
         // If the mapper wasn't supported, create the standard one:
-        nes.gui.showErrorMsg("Warning: Mapper not supported yet.");
+        nes.manager.showErrorMsg("Warning: Mapper not supported yet.");
         return new MapperDefault();
 
     }

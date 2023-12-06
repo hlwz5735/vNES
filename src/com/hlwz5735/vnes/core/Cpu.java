@@ -23,20 +23,19 @@ instructions and invokes emulation of the PPU and pAPU.
 
 package com.hlwz5735.vnes.core;
 
-import com.hlwz5735.vnes.NES;
-import com.hlwz5735.vnes.audio.PAPU;
+import com.hlwz5735.vnes.audio.Papu;
 import com.hlwz5735.vnes.common.Globals;
-import com.hlwz5735.vnes.graphics.PPU;
+import com.hlwz5735.vnes.graphics.Ppu;
 import com.hlwz5735.vnes.util.Misc;
 
-public final class CPU implements Runnable {
+public final class Cpu implements Runnable {
 
 
     // Thread:
     Thread myThread;
 
     // References to other parts of NES :
-    private NES nes;
+    private Nes nes;
     private MemoryMapper mmap;
     private short[] mem;
 
@@ -77,7 +76,7 @@ public final class CPU implements Runnable {
 
 
     // Constructor:
-    public CPU(NES nes) {
+    public Cpu(Nes nes) {
         this.nes = nes;
     }
 
@@ -230,8 +229,8 @@ public final class CPU implements Runnable {
 
         // References to other parts of NES:
         MemoryMapper mmap = nes.memMapper;
-        PPU ppu = nes.ppu;
-        PAPU papu = nes.papu;
+        Ppu ppu = nes.ppu;
+        Papu papu = nes.papu;
 
 
         // Registers:
@@ -1298,7 +1297,7 @@ public final class CPU implements Runnable {
                     if (!crash) {
                         crash = true;
                         stopRunning = true;
-                        nes.gui.showErrorMsg("Game crashed, invalid opcode at address $" + Misc.hex16(opaddr));
+                        nes.manager.showErrorMsg("Game crashed, invalid opcode at address $" + Misc.hex16(opaddr));
                     }
                     break;
 

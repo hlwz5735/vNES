@@ -17,19 +17,19 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.graphics;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.common.Globals;
 import com.hlwz5735.vnes.core.ByteBuffer;
-import com.hlwz5735.vnes.core.CPU;
+import com.hlwz5735.vnes.core.Cpu;
 import com.hlwz5735.vnes.core.HiResTimer;
 import com.hlwz5735.vnes.core.Memory;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Rom;
 import com.hlwz5735.vnes.gui.BufferView;
 import java.util.Arrays;
 
-public class PPU {
+public class Ppu {
 
-    private NES nes;
+    private Nes nes;
     private HiResTimer timer;
     private Memory ppuMem;
     private Memory sprMem;
@@ -153,7 +153,7 @@ public class PPU {
     int bufferSize, available, scale;
     public int cycles = 0;
 
-    public PPU(NES nes) {
+    public Ppu(Nes nes) {
         this.nes = nes;
     }
 
@@ -168,7 +168,7 @@ public class PPU {
 
         // Initialize misc vars:
         scanline = 0;
-        timer = nes.getGui().getTimer();
+        timer = nes.getManager().getTimer();
 
         // Create sprite arrays:
         sprX = new int[64];
@@ -237,7 +237,7 @@ public class PPU {
         defineMirrorRegion(0x3000, 0x2000, 0xf00);
         defineMirrorRegion(0x4000, 0x0000, 0x4000);
 
-        if (mirroring == ROM.HORIZONTAL_MIRRORING) {
+        if (mirroring == Rom.HORIZONTAL_MIRRORING) {
 
 
             // Horizontal mirroring.
@@ -250,7 +250,7 @@ public class PPU {
             defineMirrorRegion(0x2400, 0x2000, 0x400);
             defineMirrorRegion(0x2c00, 0x2800, 0x400);
 
-        } else if (mirroring == ROM.VERTICAL_MIRRORING) {
+        } else if (mirroring == Rom.VERTICAL_MIRRORING) {
 
             // Vertical mirroring.
 
@@ -262,7 +262,7 @@ public class PPU {
             defineMirrorRegion(0x2800, 0x2000, 0x400);
             defineMirrorRegion(0x2c00, 0x2400, 0x400);
 
-        } else if (mirroring == ROM.SINGLESCREEN_MIRRORING) {
+        } else if (mirroring == Rom.SINGLESCREEN_MIRRORING) {
 
             // Single Screen mirroring
 
@@ -275,7 +275,7 @@ public class PPU {
             defineMirrorRegion(0x2800, 0x2000, 0x400);
             defineMirrorRegion(0x2c00, 0x2000, 0x400);
 
-        } else if (mirroring == ROM.SINGLESCREEN_MIRRORING2) {
+        } else if (mirroring == Rom.SINGLESCREEN_MIRRORING2) {
 
 
             ntable1[0] = 1;
@@ -356,17 +356,17 @@ public class PPU {
         }
 
         // Do NMI:
-        nes.getCpu().requestIrq(CPU.IRQ_NMI);
+        nes.getCpu().requestIrq(Cpu.IRQ_NMI);
 
         // Make sure everything is rendered:
         if (lastRenderedScanline < 239) {
-            renderFramePartially(nes.gui.getScreenView().getBuffer(), lastRenderedScanline + 1, 240 - lastRenderedScanline);
+            renderFramePartially(nes.manager.getScreenView().getBuffer(), lastRenderedScanline + 1, 240 - lastRenderedScanline);
         }
 
         endFrame();
 
         // Notify image buffer:
-        nes.getGui().getScreenView().imageReady(false);
+        nes.getManager().getScreenView().imageReady(false);
 
         // Reset scanline counter:
         lastRenderedScanline = -1;
@@ -485,7 +485,7 @@ public class PPU {
 
     public void startFrame() {
 
-        int[] buffer = nes.getGui().getScreenView().getBuffer();
+        int[] buffer = nes.getManager().getScreenView().getBuffer();
 
         // Set background color:
         int bgColor = 0;
@@ -538,7 +538,7 @@ public class PPU {
 
     public void endFrame() {
 
-        int[] buffer = nes.getGui().getScreenView().getBuffer();
+        int[] buffer = nes.getManager().getScreenView().getBuffer();
 
         // Draw spr#0 hit coordinates:
         if (showSpr0Hit) {
@@ -1041,7 +1041,7 @@ public class PPU {
             renderSpritesPartially(startScan, scanCount, false);
         }
 
-        BufferView screen = nes.getGui().getScreenView();
+        BufferView screen = nes.getManager().getScreenView();
         if (screen.scalingEnabled() && !screen.useHWScaling() && !requestRenderAll) {
 
             // Check which scanlines have changed, to try to
@@ -1172,7 +1172,7 @@ public class PPU {
 
     private void renderSpritesPartially(int startscan, int scancount, boolean bgPri) {
 
-        buffer = nes.getGui().getScreenView().getBuffer();
+        buffer = nes.getManager().getScreenView().getBuffer();
         if (f_spVisibility == 1) {
 
             int sprT1, sprT2;
@@ -1393,7 +1393,7 @@ public class PPU {
 
     public void renderPattern() {
 
-        BufferView scr = nes.getGui().getPatternView();
+        BufferView scr = nes.getManager().getPatternView();
         int[] buffer = scr.getBuffer();
 
         int tIndex = 0;
@@ -1405,13 +1405,13 @@ public class PPU {
                 }
             }
         }
-        nes.getGui().getPatternView().imageReady(false);
+        nes.getManager().getPatternView().imageReady(false);
 
     }
 
     public void renderNameTables() {
 
-        int[] buffer = nes.getGui().getNameTableView().getBuffer();
+        int[] buffer = nes.getManager().getNameTableView().getBuffer();
         if (f_bgPatternTable == 0) {
             baseTile = 0;
         } else {
@@ -1421,9 +1421,9 @@ public class PPU {
         int ntx_max = 2;
         int nty_max = 2;
 
-        if (currentMirroring == ROM.HORIZONTAL_MIRRORING) {
+        if (currentMirroring == Rom.HORIZONTAL_MIRRORING) {
             ntx_max = 1;
-        } else if (currentMirroring == ROM.VERTICAL_MIRRORING) {
+        } else if (currentMirroring == Rom.VERTICAL_MIRRORING) {
             nty_max = 1;
         }
 
@@ -1445,14 +1445,14 @@ public class PPU {
             }
         }
 
-        if (currentMirroring == ROM.HORIZONTAL_MIRRORING) {
+        if (currentMirroring == Rom.HORIZONTAL_MIRRORING) {
             // double horizontally:
             for (int y = 0; y < 240; y++) {
                 for (int x = 0; x < 128; x++) {
                     buffer[(y << 8) + 128 + x] = buffer[(y << 8) + x];
                 }
             }
-        } else if (currentMirroring == ROM.VERTICAL_MIRRORING) {
+        } else if (currentMirroring == Rom.VERTICAL_MIRRORING) {
             // double vertically:
             for (int y = 0; y < 120; y++) {
                 for (int x = 0; x < 256; x++) {
@@ -1461,13 +1461,13 @@ public class PPU {
             }
         }
 
-        nes.getGui().getNameTableView().imageReady(false);
+        nes.getManager().getNameTableView().imageReady(false);
 
     }
 
     private void renderPalettes() {
 
-        int[] buffer = nes.getGui().getImgPalView().getBuffer();
+        int[] buffer = nes.getManager().getImgPalView().getBuffer();
         for (int i = 0; i < 16; i++) {
             for (int y = 0; y < 16; y++) {
                 for (int x = 0; x < 16; x++) {
@@ -1476,7 +1476,7 @@ public class PPU {
             }
         }
 
-        buffer = nes.getGui().getSprPalView().getBuffer();
+        buffer = nes.getManager().getSprPalView().getBuffer();
         for (int i = 0; i < 16; i++) {
             for (int y = 0; y < 16; y++) {
                 for (int x = 0; x < 16; x++) {
@@ -1485,8 +1485,8 @@ public class PPU {
             }
         }
 
-        nes.getGui().getImgPalView().imageReady(false);
-        nes.getGui().getSprPalView().imageReady(false);
+        nes.getManager().getImgPalView().imageReady(false);
+        nes.getManager().getSprPalView().imageReady(false);
 
     }
 
@@ -1674,7 +1674,7 @@ public class PPU {
         // Set VBlank flag:
         setStatusFlag(STATUS_VBLANK, true);
         // nes.getCpu().doNonMaskableInterrupt();
-        nes.getCpu().requestIrq(CPU.IRQ_NMI);
+        nes.getCpu().requestIrq(Cpu.IRQ_NMI);
 
     }
 

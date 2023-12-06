@@ -17,9 +17,9 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Nes;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper021 extends MapperDefault {
 
@@ -28,7 +28,7 @@ public class Mapper021 extends MapperDefault {
     private int irq_enabled = 0;
     private final int[] regs = new int[9];
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
         super.init(nes);
         reset();
     }
@@ -56,13 +56,13 @@ public class Mapper021 extends MapperDefault {
                 case 0x9000: {
                     value &= 0x03;
                     if (value == 0) {
-                        nes.getPpu().setMirroring(ROM.VERTICAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.VERTICAL_MIRRORING);
                     } else if (value == 1) {
-                        nes.getPpu().setMirroring(ROM.HORIZONTAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.HORIZONTAL_MIRRORING);
                     } else if (value == 2) {
-                        nes.getPpu().setMirroring(ROM.SINGLESCREEN_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.SINGLESCREEN_MIRRORING);
                     } else {
-                        nes.getPpu().setMirroring(ROM.SINGLESCREEN_MIRRORING2);
+                        nes.getPpu().setMirroring(Rom.SINGLESCREEN_MIRRORING2);
                     }
                 }
                 break;
@@ -218,7 +218,7 @@ public class Mapper021 extends MapperDefault {
         }
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         if (!rom.isValid()) {
             System.out.println("VRC4: Invalid ROM! Unable to load.");
@@ -241,7 +241,7 @@ public class Mapper021 extends MapperDefault {
         loadBatteryRam();
 
         // Do Reset-Interrupt:
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
     }
 
     public int syncH(int scanline) {

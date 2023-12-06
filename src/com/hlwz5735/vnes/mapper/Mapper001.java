@@ -17,10 +17,10 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.core.ByteBuffer;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper001 extends MapperDefault {
 
@@ -46,7 +46,7 @@ public class Mapper001 extends MapperDefault {
     int regBuffer;
     int regBufferCounter;
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
 
         super.init(nes);
 
@@ -168,11 +168,11 @@ public class Mapper001 extends MapperDefault {
                 if ((mirroring & 2) == 0) {
                     // SingleScreen mirroring overrides the other setting:
                     ////System.out.println("MMC1: Setting Singlescreen Mirroring.");
-                    nes.getPpu().setMirroring(ROM.SINGLESCREEN_MIRRORING);
+                    nes.getPpu().setMirroring(Rom.SINGLESCREEN_MIRRORING);
                 } else {
                     // Not overridden by SingleScreen mirroring.
                     ////System.out.println("MMC1: Setting Normal Mirroring. value="+mirroring);
-                    nes.getPpu().setMirroring((mirroring & 1) != 0 ? ROM.HORIZONTAL_MIRRORING : ROM.VERTICAL_MIRRORING);
+                    nes.getPpu().setMirroring((mirroring & 1) != 0 ? Rom.HORIZONTAL_MIRRORING : Rom.VERTICAL_MIRRORING);
                 }
             }
 
@@ -312,7 +312,7 @@ public class Mapper001 extends MapperDefault {
 
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         // System.out.println("Loading ROM.");
 
@@ -333,7 +333,7 @@ public class Mapper001 extends MapperDefault {
 
         // Do Reset-Interrupt:
         // nes.getCpu().doResetInterrupt();
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
 
     }
 

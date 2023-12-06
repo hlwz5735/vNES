@@ -17,11 +17,11 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 
 public class Mapper034 extends MapperDefault {
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
         super.init(nes);
     }
 

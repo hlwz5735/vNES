@@ -17,14 +17,14 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.audio;
 
-import com.hlwz5735.vnes.core.CPU;
+import com.hlwz5735.vnes.core.Cpu;
 
 public class ChannelDM implements PapuChannel {
 
     public static final int MODE_NORMAL = 0;
     public static final int MODE_LOOP = 1;
     public static final int MODE_IRQ = 2;
-    PAPU papu;
+    Papu papu;
     boolean isEnabled;
     boolean hasSample;
     boolean irqGenerated = false;
@@ -43,89 +43,66 @@ public class ChannelDM implements PapuChannel {
     int dacLsb;
     int data;
 
-    public ChannelDM(PAPU papu) {
+    public ChannelDM(Papu papu) {
         this.papu = papu;
     }
 
     public void clockDmc() {
-
         // Only alter DAC value if the sample buffer has data:
         if (hasSample) {
-
             if ((data & 1) == 0) {
-
                 // Decrement delta:
                 if (deltaCounter > 0) {
                     deltaCounter--;
                 }
-
             } else {
-
                 // Increment delta:
                 if (deltaCounter < 63) {
                     deltaCounter++;
                 }
-
             }
 
             // Update sample value:
             sample = isEnabled ? (deltaCounter << 1) + dacLsb : 0;
-
             // Update shift register:
             data >>= 1;
-
         }
 
         dmaCounter--;
         if (dmaCounter <= 0) {
-
             // No more sample bits.
             hasSample = false;
             endOfSample();
             dmaCounter = 8;
-
         }
 
         if (irqGenerated) {
-            papu.nes.cpu.requestIrq(CPU.IRQ_NORMAL);
+            papu.nes.cpu.requestIrq(Cpu.IRQ_NORMAL);
         }
-
     }
 
     private void endOfSample() {
-
-
         if (playLengthCounter == 0 && playMode == MODE_LOOP) {
-
             // Start from beginning of sample:
             playAddress = playStartAddress;
             playLengthCounter = playLength;
-
         }
 
         if (playLengthCounter > 0) {
-
             // Fetch next sample:
             nextSample();
 
             if (playLengthCounter == 0) {
-
                 // Last byte of sample fetched, generate IRQ:
                 if (playMode == MODE_IRQ) {
-
                     // Generate IRQ:
                     irqGenerated = true;
-
                 }
-
             }
-
         }
-
     }
 
     private void nextSample() {
-
         // Fetch byte:
         data = papu.getNes().getMemoryMapper().load(playAddress);
         papu.getNes().cpu.haltCycles(4);
@@ -137,13 +114,10 @@ public class ChannelDM implements PapuChannel {
         }
 
         hasSample = true;
-
     }
 
     public void writeReg(int address, int value) {
-
         if (address == 0x4010) {
-
             // Play mode, DMA Frequency
             if ((value >> 6) == 0) {
                 playMode = MODE_NORMAL;
@@ -158,9 +132,7 @@ public class ChannelDM implements PapuChannel {
             }
 
             dmaFrequency = papu.getDmcFrequency(value & 0xF);
-
         } else if (address == 0x4011) {
-
             // Delta counter load register:
             deltaCounter = (value >> 1) & 63;
             dacLsb = value & 1;
@@ -169,21 +141,18 @@ public class ChannelDM implements PapuChannel {
             }
 
         } else if (address == 0x4012) {
-
             // DMA address load register
             playStartAddress = (value << 6) | 0x0C000;
             playAddress = playStartAddress;
             reg4012 = value;
 
         } else if (address == 0x4013) {
-
             // Length of play code
             playLength = (value << 4) + 1;
             playLengthCounter = playLength;
             reg4013 = value;
 
         } else if (address == 0x4015) {
-
             // DMC/IRQ Status
             if (((value >> 4) & 1) == 0) {
                 // Disable:
@@ -195,16 +164,13 @@ public class ChannelDM implements PapuChannel {
             }
             irqGenerated = false;
         }
-
     }
 
     public void setEnabled(boolean value) {
-
         if ((!isEnabled) && value) {
             playLengthCounter = playLength;
         }
         isEnabled = value;
-
     }
 
     public boolean isEnabled() {
@@ -220,7 +186,6 @@ public class ChannelDM implements PapuChannel {
     }
 
     public void reset() {
-
         isEnabled = false;
         irqGenerated = false;
         playMode = MODE_NORMAL;
@@ -238,7 +203,6 @@ public class ChannelDM implements PapuChannel {
         reg4012 = 0;
         reg4013 = 0;
         data = 0;
-
     }
 
     public void destroy() {

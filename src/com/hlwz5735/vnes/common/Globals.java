@@ -17,13 +17,14 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.common;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Globals {
 
-    public static double CPU_FREQ_NTSC = 1789772.5d;
-    public static double CPU_FREQ_PAL = 1773447.4d;
+    public static final double CPU_FREQ_NTSC = 1789772.5d;
+    public static final double CPU_FREQ_PAL = 1773447.4d;
     public static int preferredFrameRate = 60;
 
     // Microseconds per frame:
@@ -41,12 +42,12 @@ public class Globals {
     public static boolean enableSound = true;
     public static boolean focused = false;
 
-    public static HashMap<String, Integer> keycodes = new HashMap<>(); // Java key codes
-    public static HashMap<String, String> controls = new HashMap<>(); // vNES controls codes
+    public static final Map<String, Integer> keycodes = new HashMap<>(); // Java key codes
+    public static final Map<String, String> controls = new HashMap<>(); // vNES controls codes
 
-    public static NES nes;
+    public static Nes nes;
 
     public static void println(String s) {
-        nes.getGui().println(s);
+        nes.getManager().println(s);
     }
 }

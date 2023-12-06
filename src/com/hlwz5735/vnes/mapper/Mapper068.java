@@ -17,8 +17,8 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper068 extends MapperDefault {
 
@@ -112,19 +112,19 @@ public class Mapper068 extends MapperDefault {
             // Normal mirroring modes:
             switch (r2) {
                 case 0: {
-                    ppu.setMirroring(ROM.HORIZONTAL_MIRRORING);
+                    ppu.setMirroring(Rom.HORIZONTAL_MIRRORING);
                     break;
                 }
                 case 1: {
-                    ppu.setMirroring(ROM.VERTICAL_MIRRORING);
+                    ppu.setMirroring(Rom.VERTICAL_MIRRORING);
                     break;
                 }
                 case 2: {
-                    ppu.setMirroring(ROM.SINGLESCREEN_MIRRORING);
+                    ppu.setMirroring(Rom.SINGLESCREEN_MIRRORING);
                     break;
                 }
                 case 3: {
-                    ppu.setMirroring(ROM.SINGLESCREEN_MIRRORING2);
+                    ppu.setMirroring(Rom.SINGLESCREEN_MIRRORING2);
                     break;
                 }
             }
@@ -151,7 +151,7 @@ public class Mapper068 extends MapperDefault {
 
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         // System.out.println("Loading ROM.");
 
@@ -174,7 +174,7 @@ public class Mapper068 extends MapperDefault {
         loadBatteryRam();
 
         // Do Reset-Interrupt:
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
 
     }
 

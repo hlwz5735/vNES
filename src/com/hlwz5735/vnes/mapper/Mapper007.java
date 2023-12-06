@@ -17,9 +17,9 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.core.ByteBuffer;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper007 extends MapperDefault {
 
@@ -27,14 +27,14 @@ public class Mapper007 extends MapperDefault {
     int currentMirroring;
     short[] prgrom;
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
 
         super.init(nes);
         currentOffset = 0;
         currentMirroring = -1;
 
         // Get ref to ROM:
-        ROM rom = nes.getRom();
+        Rom rom = nes.getRom();
 
         // Read out all PRG rom:
         int bc = rom.getRomBankCount();
@@ -81,9 +81,9 @@ public class Mapper007 extends MapperDefault {
 
                 currentMirroring = value & 0x10;
                 if (currentMirroring == 0) {
-                    nes.getPpu().setMirroring(ROM.SINGLESCREEN_MIRRORING);
+                    nes.getPpu().setMirroring(Rom.SINGLESCREEN_MIRRORING);
                 } else {
-                    nes.getPpu().setMirroring(ROM.SINGLESCREEN_MIRRORING2);
+                    nes.getPpu().setMirroring(Rom.SINGLESCREEN_MIRRORING2);
                 }
 
             }

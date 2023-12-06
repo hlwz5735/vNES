@@ -18,7 +18,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.hlwz5735.vnes.util;
 
 import com.hlwz5735.vnes.common.Globals;
-import com.hlwz5735.vnes.gui.UI;
+import com.hlwz5735.vnes.gui.NesManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,7 +30,7 @@ import java.util.zip.ZipInputStream;
 
 public class FileLoader {
     // Load a file.
-    public short[] loadFile(String fileName, UI ui) {
+    public short[] loadFile(String fileName, NesManager manager) {
         int flen;
         byte[] tmp = new byte[2048];
 
@@ -57,9 +57,9 @@ public class FileLoader {
                     ZipEntry entry = zis.getNextEntry();
                     total = entry.getSize();
                     zip = true;
-                } else if (Globals.appletMode && ui != null) {
+                } else if (Globals.appletMode && manager != null) {
                     // Can't get the file size, so use the applet parameter
-                    total = ui.getRomFileSize();
+                    total = manager.getRomFileSize();
                 }
 
                 long progress = -1;
@@ -76,8 +76,8 @@ public class FileLoader {
 
                     if (total > 0 && ((pos * 100L) / total) > progress) {
                         progress = (pos * 100L) / total;
-                        if (ui != null) {
-                            ui.showLoadProgress((int) progress);
+                        if (manager != null) {
+                            manager.showLoadProgress((int) progress);
                         }
                     }
                 }

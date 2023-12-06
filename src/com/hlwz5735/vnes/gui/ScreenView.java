@@ -17,7 +17,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.gui;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.common.Globals;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -27,7 +27,7 @@ public class ScreenView extends BufferView {
     private MyMouseAdapter mouse;
     private boolean notifyImageReady;
 
-    public ScreenView(NES nes, int width, int height) {
+    public ScreenView(Nes nes, int width, int height) {
         super(nes, width, height);
     }
 
@@ -88,7 +88,7 @@ public class ScreenView extends BufferView {
 
         // Notify GUI, so it can write the sound buffer:
         if (notifyImageReady) {
-            nes.getGui().imageReady(skipFrame);
+            nes.getManager().imageReady(skipFrame);
         }
 
     }

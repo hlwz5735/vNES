@@ -19,7 +19,7 @@ package com.hlwz5735.vnes.audio;
 
 public class ChannelNoise implements PapuChannel {
 
-    PAPU papu;
+    Papu papu;
     public boolean isEnabled;
     public boolean envDecayDisable;
     public boolean envDecayLoopEnable;
@@ -41,7 +41,7 @@ public class ChannelNoise implements PapuChannel {
     public long accCount = 1;
     public int tmp;
 
-    public ChannelNoise(PAPU papu) {
+    public ChannelNoise(Papu papu) {
         this.papu = papu;
         shiftReg = 1 << 14;
     }

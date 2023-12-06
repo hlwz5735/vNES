@@ -17,22 +17,22 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Nes;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper071 extends MapperDefault {
 
     int curBank;
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
 
         super.init(nes);
         reset();
 
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         // System.out.println("Loading ROM.");
 
@@ -55,7 +55,7 @@ public class Mapper071 extends MapperDefault {
         loadBatteryRam();
 
         // Do Reset-Interrupt:
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
 
     }
 

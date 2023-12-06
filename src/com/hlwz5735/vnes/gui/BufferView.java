@@ -17,7 +17,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.gui;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -34,7 +34,7 @@ public class BufferView extends JPanel {
     public static final int SCALE_NORMAL = 3;
     public static final int SCALE_SCANLINE = 4;
     public static final int SCALE_RASTER = 5;
-    protected NES nes;
+    protected Nes nes;
     private BufferedImage img;
     private VolatileImage vimg;
     private boolean usingMenu = false;
@@ -53,7 +53,7 @@ public class BufferView extends JPanel {
     private int bgColor = Color.white.darker().getRGB();
 
     // Constructor
-    public BufferView(NES nes, int width, int height) {
+    public BufferView(Nes nes, int width, int height) {
 
         super(false);
         this.nes = nes;
@@ -307,7 +307,7 @@ public class BufferView extends JPanel {
             // Update FPS count:
             if (--fpsCounter <= 0) {
 
-                long ct = nes.getGui().getTimer().currentMicros();
+                long ct = nes.getManager().getTimer().currentMicros();
                 long frameT = (ct - prevFrameTime) / 45;
                 if (frameT == 0) {
                     fps = "FPS: -";

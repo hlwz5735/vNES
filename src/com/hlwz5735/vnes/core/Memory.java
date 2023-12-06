@@ -1,6 +1,5 @@
 package com.hlwz5735.vnes.core;
 
-import com.hlwz5735.vnes.NES;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,9 +9,9 @@ public class Memory {
 
     public short[] mem;
     int memLength;
-    NES nes;
+    Nes nes;
 
-    public Memory(NES nes, int byteCount) {
+    public Memory(Nes nes, int byteCount) {
         this.nes = nes;
         mem = new short[byteCount];
         memLength = byteCount;

@@ -1,6 +1,6 @@
 package com.hlwz5735.vnes;
 
-import com.hlwz5735.vnes.gui.vNES;
+import com.hlwz5735.vnes.gui.NesPanel;
 import javax.swing.*;
 
 public class Main {
@@ -12,7 +12,7 @@ public class Main {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
 
-            vNES mainPanel = new vNES();
+            NesPanel mainPanel = new NesPanel();
             frame.add(mainPanel);
             mainPanel.init();
             new Thread(mainPanel).start();

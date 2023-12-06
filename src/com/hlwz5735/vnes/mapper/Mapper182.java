@@ -17,9 +17,9 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Nes;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper182 extends MapperDefault {
 
@@ -27,7 +27,7 @@ public class Mapper182 extends MapperDefault {
     private boolean irq_enabled = false;
     private final int[] regs = new int[1];
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
         super.init(nes);
         reset();
     }
@@ -40,9 +40,9 @@ public class Mapper182 extends MapperDefault {
             switch (address & 0xF003) {
                 case 0x8001: {
                     if ((value & 0x01) != 0) {
-                        nes.getPpu().setMirroring(ROM.HORIZONTAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.HORIZONTAL_MIRRORING);
                     } else {
-                        nes.getPpu().setMirroring(ROM.VERTICAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.VERTICAL_MIRRORING);
                     }
                 }
                 break;
@@ -106,7 +106,7 @@ public class Mapper182 extends MapperDefault {
         }
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         if (!rom.isValid()) {
             System.out.println("182: Invalid ROM! Unable to load.");
@@ -126,7 +126,7 @@ public class Mapper182 extends MapperDefault {
         loadCHRROM();
 
         // Do Reset-Interrupt:
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
     }
 
     public int syncH(int scanline) {

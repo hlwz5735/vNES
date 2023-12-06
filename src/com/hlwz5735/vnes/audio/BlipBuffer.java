@@ -39,7 +39,6 @@ public class BlipBuffer {
     int dc_acc;
 
     public void init(int bufferSize, int windowSize, int samplePeriod, int sincPeriods) {
-
         win_size = windowSize;
         smp_period = samplePeriod;
         sinc_periods = sincPeriods;
@@ -69,11 +68,9 @@ public class BlipBuffer {
         dc_prev = 0;
         dc_diff = 0;
         dc_acc = 0;
-
     }
 
     public void impulse(int smpPos, int smpOffset, int magnitude) {
-
         // Add into difference buffer:
         // if(smpPos+win_size < diff.length){
         for (int i = lastChanged; i < smpPos + win_size; i++) {
@@ -85,11 +82,9 @@ public class BlipBuffer {
         lastChanged = smpPos + win_size;
         prevSum = diff[smpPos + win_size - 1];
         //}
-
     }
 
     public int integrate() {
-
         int sum = prevSum;
         for (int i = 0; i < diff.length; i++) {
 
@@ -104,7 +99,6 @@ public class BlipBuffer {
         }
         prevSum = sum;
         return lastChanged;
-
     }
 
     public void clear() {

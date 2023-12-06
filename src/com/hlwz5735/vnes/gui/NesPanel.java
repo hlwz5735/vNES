@@ -17,25 +17,24 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.gui;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.common.Globals;
 import java.awt.*;
 import javax.swing.*;
 
-public class vNES extends JPanel implements Runnable {
-
+public class NesPanel extends JPanel implements Runnable {
     boolean scale;
-    boolean scanlines;
+    boolean scanLines;
     boolean sound;
     boolean fps;
     boolean stereo;
-    boolean timeemulation;
-    boolean showsoundbuffer;
-    int samplerate;
+    boolean timeEmulation;
+    boolean showSoundBuffer;
+    int sampleRate;
     int romSize;
     int progress;
-    AppletUI gui;
-    NES nes;
+    NesManager manager;
+    Nes nes;
     ScreenView panelScreen;
     String rom = "";
     Font progressFont;
@@ -47,28 +46,25 @@ public class vNES extends JPanel implements Runnable {
         readParams();
         System.gc();
 
-        gui = new AppletUI(this);
-        gui.init(false);
+        this.manager = new NesManager(this);
+        manager.init(false);
 
         Globals.appletMode = true;
         Globals.memoryFlushValue = 0x00; // make SMB1 hacked version work.
 
-        nes = gui.getNES();
+        nes = manager.getNes();
         nes.enableSound(sound);
         nes.reset();
-
     }
 
     public void addScreenView() {
-
-        panelScreen = (ScreenView) gui.getScreenView();
+        panelScreen = (ScreenView) manager.getScreenView();
         panelScreen.setFPSEnabled(fps);
 
         this.setLayout(null);
 
         if (scale) {
-
-            if (scanlines) {
+            if (scanLines) {
                 panelScreen.setScaleMode(BufferView.SCALE_SCANLINE);
             } else {
                 panelScreen.setScaleMode(BufferView.SCALE_NORMAL);
@@ -79,25 +75,20 @@ public class vNES extends JPanel implements Runnable {
             panelScreen.setBounds(0, 0, 512, 480);
 
         } else {
-
             panelScreen.setBounds(0, 0, 256, 240);
-
         }
 
         this.setIgnoreRepaint(true);
         this.add(panelScreen);
-
     }
 
     public void start() {
-
         Thread t = new Thread(this);
         t.start();
-
     }
 
+    @Override
     public void run() {
-
         // Set font to be used for progress display of loading:
         progressFont = new Font("Jetbrains Mono", Font.BOLD, 12);
 
@@ -112,25 +103,20 @@ public class vNES extends JPanel implements Runnable {
         nes.loadRom(rom);
 
         if (nes.rom.isValid()) {
-
             // Add the screen buffer:
             addScreenView();
 
             // Set some properties:
-            Globals.timeEmulation = timeemulation;
-            nes.ppu.setShowSoundBuffer(showsoundbuffer);
+            Globals.timeEmulation = timeEmulation;
+            nes.ppu.setShowSoundBuffer(showSoundBuffer);
 
             // Start emulation:
             // System.out.println("vNES is now starting the processor.");
             nes.getCpu().beginExecution();
-
         } else {
-
             // ROM file was invalid.
             System.out.println("vNES was unable to find (" + rom + ").");
-
         }
-
     }
 
     public void stop() {
@@ -138,7 +124,6 @@ public class vNES extends JPanel implements Runnable {
         // System.out.println("vNES has stopped the processor.");
         nes.getPapu().stop();
         this.destroy();
-
     }
 
     public void destroy() {
@@ -149,11 +134,11 @@ public class vNES extends JPanel implements Runnable {
         if (nes != null) {
             nes.destroy();
         }
-        if (gui != null) {
-            gui.destroy();
+        if (manager != null) {
+            manager.destroy();
         }
 
-        gui = null;
+        manager = null;
         nes = null;
         panelScreen = null;
         rom = null;
@@ -252,9 +237,9 @@ public class vNES extends JPanel implements Runnable {
 
         tmp = getParameter("scanlines");
         if (tmp == null || tmp.isEmpty()) {
-            scanlines = false;
+            scanLines = false;
         } else {
-            scanlines = tmp.equals("on");
+            scanLines = tmp.equals("on");
         }
 
         tmp = getParameter("fps");
@@ -266,16 +251,16 @@ public class vNES extends JPanel implements Runnable {
 
         tmp = getParameter("timeemulation");
         if (tmp == null || tmp.isEmpty()) {
-            timeemulation = true;
+            timeEmulation = true;
         } else {
-            timeemulation = tmp.equals("on");
+            timeEmulation = tmp.equals("on");
         }
 
         tmp = getParameter("showsoundbuffer");
         if (tmp == null || tmp.isEmpty()) {
-            showsoundbuffer = false;
+            showSoundBuffer = false;
         } else {
-            showsoundbuffer = tmp.equals("on");
+            showSoundBuffer = tmp.equals("on");
         }
 
         /* Controller Setup for Player 1 */

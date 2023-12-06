@@ -17,13 +17,13 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Nes;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper033 extends MapperDefault {
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
         super.init(nes);
     }
 
@@ -35,9 +35,9 @@ public class Mapper033 extends MapperDefault {
             switch (address) {
                 case 0x8000: {
                     if ((value & 0x40) != 0) {
-                        nes.getPpu().setMirroring(ROM.HORIZONTAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.HORIZONTAL_MIRRORING);
                     } else {
-                        nes.getPpu().setMirroring(ROM.VERTICAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.VERTICAL_MIRRORING);
                     }
                     load8kRomBank(value & 0x1F, 0x8000);
                 }
@@ -81,7 +81,7 @@ public class Mapper033 extends MapperDefault {
         }
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         if (!rom.isValid()) {
             System.out.println("048: Invalid ROM! Unable to load.");
@@ -101,6 +101,6 @@ public class Mapper033 extends MapperDefault {
         loadCHRROM();
 
         // Do Reset-Interrupt:
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
     }
 }

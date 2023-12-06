@@ -17,16 +17,15 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.gui;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.common.Globals;
 import com.hlwz5735.vnes.core.HiResTimer;
 import com.hlwz5735.vnes.input.InputHandler;
 import com.hlwz5735.vnes.input.KbInputHandler;
 
-public class AppletUI implements UI {
-
-    vNES applet;
-    NES nes;
+public class NesManager {
+    NesPanel nesPanel;
+    Nes nes;
     KbInputHandler kbJoy1;
     KbInputHandler kbJoy2;
     ScreenView vScreen;
@@ -34,17 +33,15 @@ public class AppletUI implements UI {
     long t1, t2;
     int sleepTime;
 
-    public AppletUI(vNES applet) {
-
-        timer = new HiResTimer();
-        this.applet = applet;
-        nes = new NES(this);
+    public NesManager(NesPanel nesPanel) {
+        this.nesPanel = nesPanel;
+        this.timer = new HiResTimer();
+        this.nes = new Nes(this);
     }
 
     public void init(boolean showGui) {
-
         vScreen = new ScreenView(nes, 256, 240);
-        vScreen.setBgColor(applet.bgColor.getRGB());
+        vScreen.setBgColor(nesPanel.bgColor.getRGB());
         vScreen.init();
         vScreen.setNotifyImageReady(true);
 
@@ -90,32 +87,28 @@ public class AppletUI implements UI {
             } while ((timeToSleep = nes.papu.getMillisToAvailableAbove(min_avail)) > 0);
 
             nes.getPapu().writeBuffer();
-
         }
 
         // Sleep a bit if sound is disabled:
         if (Globals.timeEmulation && !Globals.enableSound) {
-
             sleepTime = Globals.frameTime;
             if ((t2 = timer.currentMicros()) - t1 < sleepTime) {
                 timer.sleepMicros(sleepTime - (t2 - t1));
             }
-
         }
 
         // Update timer:
         t1 = t2;
-
     }
 
     public int getRomFileSize() {
-        return applet.romSize;
+        return nesPanel.romSize;
     }
 
     public void showLoadProgress(int percentComplete) {
 
         // Show ROM load progress:
-        applet.showLoadProgress(percentComplete);
+        nesPanel.showLoadProgress(percentComplete);
 
         // Sleep a bit:
         timer.sleepMicros(20 * 1000);
@@ -135,7 +128,7 @@ public class AppletUI implements UI {
         }
 
         nes = null;
-        applet = null;
+        nesPanel = null;
         kbJoy1 = null;
         kbJoy2 = null;
         vScreen = null;
@@ -143,7 +136,7 @@ public class AppletUI implements UI {
 
     }
 
-    public NES getNES() {
+    public Nes getNes() {
         return nes;
     }
 
@@ -194,17 +187,18 @@ public class AppletUI implements UI {
     }
 
     public int getWidth() {
-        return applet.getWidth();
+        return nesPanel.getWidth();
     }
 
     public int getHeight() {
-        return applet.getHeight();
+        return nesPanel.getHeight();
     }
 
     public void println(String s) {
+        System.out.println(s);
     }
 
     public void showErrorMsg(String msg) {
-        System.out.println(msg);
+        System.err.println(msg);
     }
 }

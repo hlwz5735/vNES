@@ -15,42 +15,36 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.hlwz5735.vnes;
+package com.hlwz5735.vnes.core;
 
-import com.hlwz5735.vnes.audio.PAPU;
+import com.hlwz5735.vnes.audio.Papu;
 import com.hlwz5735.vnes.common.Globals;
-import com.hlwz5735.vnes.core.ByteBuffer;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.Memory;
-import com.hlwz5735.vnes.core.MemoryMapper;
-import com.hlwz5735.vnes.core.ROM;
-import com.hlwz5735.vnes.graphics.PPU;
+import com.hlwz5735.vnes.graphics.Ppu;
 import com.hlwz5735.vnes.graphics.PaletteTable;
-import com.hlwz5735.vnes.gui.AppletUI;
-import com.hlwz5735.vnes.gui.UI;
+import com.hlwz5735.vnes.gui.NesManager;
 import com.hlwz5735.vnes.input.InputHandler;
 
-public class NES {
+public class Nes {
 
-    public AppletUI gui;
-    public CPU cpu;
-    public PPU ppu;
-    public PAPU papu;
+    public NesManager manager;
+    public Cpu cpu;
+    public Ppu ppu;
+    public Papu papu;
     public Memory cpuMem;
     public Memory ppuMem;
     public Memory sprMem;
     public MemoryMapper memMapper;
     public PaletteTable palTable;
-    public ROM rom;
+    public Rom rom;
     int cc;
     public String romFile;
     boolean isRunning = false;
 
     // Creates the NES system.
-    public NES(AppletUI gui) {
+    public Nes(NesManager manager) {
 
         Globals.nes = this;
-        this.gui = gui;
+        this.manager = manager;
 
         // Create memory:
         cpuMem = new Memory(this, 0x10000);    // Main memory (internal to CPU)
@@ -59,10 +53,10 @@ public class NES {
 
 
         // Create system units:
-        cpu = new CPU(this);
+        cpu = new Cpu(this);
         palTable = new PaletteTable();
-        ppu = new PPU(this);
-        papu = new PAPU(this);
+        ppu = new Ppu(this);
+        papu = new Papu(this);
 
         // Init sound registers:
         for (int i = 0; i < 0x14; i++) {
@@ -214,17 +208,17 @@ public class NES {
     }
 
     // Returns CPU object.
-    public CPU getCpu() {
+    public Cpu getCpu() {
         return cpu;
     }
 
     // Returns PPU object.
-    public PPU getPpu() {
+    public Ppu getPpu() {
         return ppu;
     }
 
     // Returns pAPU object.
-    public PAPU getPapu() {
+    public Papu getPapu() {
         return papu;
     }
 
@@ -244,13 +238,13 @@ public class NES {
     }
 
     // Returns the currently loaded ROM.
-    public ROM getRom() {
+    public Rom getRom() {
         return rom;
     }
 
     // Returns the GUI.
-    public UI getGui() {
-        return gui;
+    public NesManager getManager() {
+        return manager;
     }
 
     // Returns the memory mapper.
@@ -270,7 +264,7 @@ public class NES {
         {
             // Load ROM file:
 
-            rom = new ROM(this);
+            rom = new Rom(this);
             rom.load(file);
             if (rom.isValid()) {
 
@@ -316,7 +310,7 @@ public class NES {
         palTable.reset();
         papu.reset();
 
-        InputHandler joy1 = gui.getJoy1();
+        InputHandler joy1 = manager.getJoy1();
         if (joy1 != null) {
             joy1.reset();
         }
@@ -347,15 +341,12 @@ public class NES {
     }
 
     public void setFramerate(int rate) {
-
         Globals.preferredFrameRate = rate;
         Globals.frameTime = 1000000 / rate;
         papu.setSampleRate(papu.getSampleRate(), false);
-
     }
 
     public void destroy() {
-
         if (cpu != null) {
             cpu.destroy();
         }
@@ -381,7 +372,7 @@ public class NES {
             rom.destroy();
         }
 
-        gui = null;
+        manager = null;
         cpu = null;
         ppu = null;
         papu = null;
@@ -391,6 +382,5 @@ public class NES {
         memMapper = null;
         rom = null;
         palTable = null;
-
     }
 }

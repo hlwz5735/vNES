@@ -17,10 +17,10 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
+import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.core.ByteBuffer;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper105 extends MapperDefault {
 
@@ -31,7 +31,7 @@ public class Mapper105 extends MapperDefault {
     int bits = 0;
     int write_count = 0;
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
         super.init(nes);
         reset();
     }
@@ -82,15 +82,15 @@ public class Mapper105 extends MapperDefault {
 
             if ((regs[0] & 0x02) != 0) {
                 if ((regs[0] & 0x01) != 0) {
-                    nes.getPpu().setMirroring(ROM.HORIZONTAL_MIRRORING);
+                    nes.getPpu().setMirroring(Rom.HORIZONTAL_MIRRORING);
                 } else {
-                    nes.getPpu().setMirroring(ROM.VERTICAL_MIRRORING);
+                    nes.getPpu().setMirroring(Rom.VERTICAL_MIRRORING);
                 }
             } else {
                 if ((regs[0] & 0x01) != 0) {
-                    nes.getPpu().setMirroring(ROM.SINGLESCREEN_MIRRORING2);
+                    nes.getPpu().setMirroring(Rom.SINGLESCREEN_MIRRORING2);
                 } else {
-                    nes.getPpu().setMirroring(ROM.SINGLESCREEN_MIRRORING);
+                    nes.getPpu().setMirroring(Rom.SINGLESCREEN_MIRRORING);
                 }
             }
 
@@ -154,7 +154,7 @@ public class Mapper105 extends MapperDefault {
 
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         if (!rom.isValid()) {
             // System.out.println("Invalid ROM! Unable to load.");
@@ -170,7 +170,7 @@ public class Mapper105 extends MapperDefault {
         loadCHRROM();
 
         // Do Reset-Interrupt:
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
 
     }
 

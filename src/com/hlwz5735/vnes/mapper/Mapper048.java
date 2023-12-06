@@ -15,16 +15,16 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.hlwz5735.vnes.NES;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Nes;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper048 extends MapperDefault {
 
     private int irq_counter = 0;
     private boolean irq_enabled = false;
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
         super.init(nes);
         reset();
     }
@@ -91,9 +91,9 @@ public class Mapper048 extends MapperDefault {
 
                 case 0xE000: {
                     if ((value & 0x40) != 0) {
-                        nes.getPpu().setMirroring(ROM.HORIZONTAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.HORIZONTAL_MIRRORING);
                     } else {
-                        nes.getPpu().setMirroring(ROM.VERTICAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.VERTICAL_MIRRORING);
                     }
                 }
                 break;
@@ -102,7 +102,7 @@ public class Mapper048 extends MapperDefault {
         }
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         if (!rom.isValid()) {
             System.out.println("VRC4: Invalid ROM! Unable to load.");
@@ -125,7 +125,7 @@ public class Mapper048 extends MapperDefault {
         loadBatteryRam();
 
         // Do Reset-Interrupt:
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
     }
 
     public int syncH(int scanline) {

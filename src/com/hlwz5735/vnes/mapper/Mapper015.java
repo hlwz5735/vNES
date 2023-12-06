@@ -17,13 +17,13 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.mapper;
 
-import com.hlwz5735.vnes.NES;
-import com.hlwz5735.vnes.core.CPU;
-import com.hlwz5735.vnes.core.ROM;
+import com.hlwz5735.vnes.core.Nes;
+import com.hlwz5735.vnes.core.Cpu;
+import com.hlwz5735.vnes.core.Rom;
 
 public class Mapper015 extends MapperDefault {
 
-    public void init(NES nes) {
+    public void init(Nes nes) {
         super.init(nes);
     }
 
@@ -47,9 +47,9 @@ public class Mapper015 extends MapperDefault {
                         load8kRomBank((value & 0x3F) * 2 + 3, 0xE000);
                     }
                     if ((value & 0x40) != 0) {
-                        nes.getPpu().setMirroring(ROM.HORIZONTAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.HORIZONTAL_MIRRORING);
                     } else {
-                        nes.getPpu().setMirroring(ROM.VERTICAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.VERTICAL_MIRRORING);
                     }
                 }
                 break;
@@ -86,9 +86,9 @@ public class Mapper015 extends MapperDefault {
                         load8kRomBank((value & 0x3F) * 2 + 1, 0xE000);
                     }
                     if ((value & 0x40) != 0) {
-                        nes.getPpu().setMirroring(ROM.HORIZONTAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.HORIZONTAL_MIRRORING);
                     } else {
-                        nes.getPpu().setMirroring(ROM.VERTICAL_MIRRORING);
+                        nes.getPpu().setMirroring(Rom.VERTICAL_MIRRORING);
                     }
                 }
                 break;
@@ -96,7 +96,7 @@ public class Mapper015 extends MapperDefault {
         }
     }
 
-    public void loadROM(ROM rom) {
+    public void loadROM(Rom rom) {
 
         if (!rom.isValid()) {
             System.out.println("015: Invalid ROM! Unable to load.");
@@ -117,6 +117,6 @@ public class Mapper015 extends MapperDefault {
         loadBatteryRam();
 
         // Do Reset-Interrupt:
-        nes.getCpu().requestIrq(CPU.IRQ_RESET);
+        nes.getCpu().requestIrq(Cpu.IRQ_RESET);
     }
 }
