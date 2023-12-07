@@ -33,9 +33,12 @@ public class NesPanel extends JPanel implements Runnable {
     int sampleRate;
     int romSize;
     int progress;
+
     NesManager manager;
     Nes nes;
-    ScreenView panelScreen;
+
+    ScreenView screenView;
+
     String rom = "";
     Font progressFont;
     Color bgColor = Color.black.darker().darker();
@@ -58,33 +61,28 @@ public class NesPanel extends JPanel implements Runnable {
     }
 
     public void addScreenView() {
-        panelScreen = (ScreenView) manager.getScreenView();
-        panelScreen.setFPSEnabled(fps);
+        screenView = (ScreenView) manager.getScreenView();
+        screenView.setFPSEnabled(fps);
 
-        this.setLayout(null);
+        this.setLayout(new BorderLayout());
 
         if (scale) {
             if (scanLines) {
-                panelScreen.setScaleMode(BufferView.SCALE_SCANLINE);
+                screenView.setScaleMode(BufferView.SCALE_SCANLINE);
             } else {
-                panelScreen.setScaleMode(BufferView.SCALE_NORMAL);
+                screenView.setScaleMode(BufferView.SCALE_NORMAL);
             }
 
             this.setSize(512, 480);
             this.setBounds(0, 0, 512, 480);
-            panelScreen.setBounds(0, 0, 512, 480);
+            screenView.setBounds(0, 0, 512, 480);
 
         } else {
-            panelScreen.setBounds(0, 0, 256, 240);
+            screenView.setBounds(0, 0, 256, 240);
         }
 
         this.setIgnoreRepaint(true);
-        this.add(panelScreen);
-    }
-
-    public void start() {
-        Thread t = new Thread(this);
-        t.start();
+        this.add(screenView, BorderLayout.CENTER);
     }
 
     @Override
@@ -140,7 +138,7 @@ public class NesPanel extends JPanel implements Runnable {
 
         manager = null;
         nes = null;
-        panelScreen = null;
+        screenView = null;
         rom = null;
 
         System.runFinalization();
@@ -174,7 +172,7 @@ public class NesPanel extends JPanel implements Runnable {
 
         // Fill background:
         g.setColor(bgColor);
-        g.fillRect(0, 0, scrw, scrh);
+        g.fillRect(0, 0, getWidth(), getHeight());
 
         // Prepare text:
         if (progress < 10) {
@@ -264,7 +262,6 @@ public class NesPanel extends JPanel implements Runnable {
         }
 
         /* Controller Setup for Player 1 */
-
         tmp = getParameter("p1_up");
         if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p1_up", "VK_UP");
@@ -315,7 +312,6 @@ public class NesPanel extends JPanel implements Runnable {
         }
 
         /* Controller Setup for Player 2 */
-
         tmp = getParameter("p2_up");
         if (tmp == null || tmp.isEmpty()) {
             Globals.controls.put("p2_up", "VK_NUMPAD8");

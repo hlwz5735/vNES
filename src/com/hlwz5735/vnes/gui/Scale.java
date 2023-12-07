@@ -24,10 +24,14 @@ public class Scale {
     private static int brightenCutoffMask;
     private static int darkenShift;
     private static int darkenShiftMask;
-    private static int si, di, di2, val, x, y;
+    private static int si;
+    private static int di;
+    private static int di2;
+    private static int val;
+    private static int x;
+    private static int y;
 
     public static void setFilterParams(int darkenDepth, int brightenDepth) {
-
         switch (darkenDepth) {
             case 0: {
                 darkenShift = 0;
@@ -88,11 +92,9 @@ public class Scale {
                 break;
             }
         }
-
     }
 
-    public static final void doScanlineScaling(int[] src, int[] dest, boolean[] changed) {
-
+    public static void doScanlineScaling(int[] src, int[] dest, boolean[] changed) {
         int di = 0;
         int di2 = 512;
         int val, max;
@@ -101,25 +103,19 @@ public class Scale {
             if (changed[y]) {
                 max = (y + 1) << 8;
                 for (int si = y << 8; si < max; si++) {
-
                     // get pixel value:
                     val = src[si];
-
                     // fill the two pixels on the current scanline:
                     dest[di] = val;
                     dest[++di] = val;
-
                     // darken pixel:
                     val -= ((val >> 2) & 0x003F3F3F);
-
                     // fill the two pixels on the next scanline:
                     dest[di2] = val;
                     dest[++di2] = val;
-
                     // si ++;
                     di++;
                     di2++;
-
                 }
             } else {
                 di += 512;
@@ -129,40 +125,36 @@ public class Scale {
             // skip one scanline:
             di += 512;
             di2 += 512;
-
         }
-
     }
 
-    public static final void doRasterScaling(int[] src, int[] dest, boolean[] changed) {
-
+    public static void doRasterScaling(int[] src, int[] dest, boolean[] changed) {
         int di = 0;
         int di2 = 512;
 
         int max;
-        int col1, col2, col3;
-        int r, g, b;
+        int col1;
+        int col2;
+        int col3;
+        int r;
+        int g;
+        int b;
         int flag = 0;
 
         for (int y = 0; y < 240; y++) {
             if (changed[y]) {
                 max = (y + 1) << 8;
                 for (int si = y << 8; si < max; si++) {
-
                     // get pixel value:
                     col1 = src[si];
-
                     // fill the two pixels on the current scanline:
                     dest[di] = col1;
                     dest[++di] = col1;
-
                     // fill the two pixels on the next scanline:
                     dest[di2] = col1;
                     dest[++di2] = col1;
-
                     // darken pixel:
                     col2 = col1 - ((col1 >> darkenShift) & darkenShiftMask);
-
                     // brighten pixel:
                     col3 = col1 +
                             ((((0x00FFFFFF - col1) & brightenCutoffMask) >> brightenShift) & brightenShiftMask);
@@ -174,7 +166,6 @@ public class Scale {
 
                     di++;
                     di2++;
-
                 }
             } else {
                 di += 512;
@@ -184,13 +175,10 @@ public class Scale {
             // skip one scanline:
             di += 512;
             di2 += 512;
-
         }
-
     }
 
-    public static final void doNormalScaling(int[] src, int[] dest, boolean[] changed) {
-
+    public static void doNormalScaling(int[] src, int[] dest, boolean[] changed) {
         int di = 0;
         int di2 = 512;
         int val, max;
@@ -199,18 +187,14 @@ public class Scale {
             if (changed[y]) {
                 max = (y + 1) << 8;
                 for (int si = y << 8; si < max; si++) {
-
                     // get pixel value:
                     val = src[si];
-
                     // fill the two pixels on the current scanline:
                     dest[di++] = val;
                     dest[di++] = val;
-
                     // fill the two pixels on the next scanline:
                     dest[di2++] = val;
                     dest[di2++] = val;
-
                 }
             } else {
                 di += 512;
@@ -220,8 +204,6 @@ public class Scale {
             // skip one scanline:
             di += 512;
             di2 += 512;
-
         }
-
     }
 }

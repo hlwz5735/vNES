@@ -135,10 +135,10 @@ public class Ppu {
     int b2;
 
     // Variables used when rendering:
-    int[] attrib = new int[32];
-    int[] bgbuffer = new int[256 * 240];
+    int[] attributes = new int[32];
+    int[] bgBuffer = new int[256 * 240];
     int[] pixrendered = new int[256 * 240];
-    int[] spr0dummybuffer = new int[256 * 240];
+    int[] spr0DummyBuffer = new int[256 * 240];
     int[] dummyPixPriTable = new int[256 * 240];
     int[] oldFrame = new int[256 * 240];
     int[] buffer;
@@ -414,7 +414,7 @@ public class Ppu {
                     // update scroll:
                     cntHt = regHt;
                     cntH = regH;
-                    renderBgScanline(bgbuffer, scanline + 1 - 21);
+                    renderBgScanline(bgBuffer, scanline + 1 - 21);
                 }
                 scanlineAlreadyRendered = false;
 
@@ -907,7 +907,7 @@ public class Ppu {
             }
             for (destIndex = si; destIndex < ei; destIndex++) {
                 if (pixrendered[destIndex] > 0xFF) {
-                    buffer[destIndex] = bgbuffer[destIndex];
+                    buffer[destIndex] = bgBuffer[destIndex];
                 }
             }
         }
@@ -961,14 +961,14 @@ public class Ppu {
                         // Get data from array:
                         t = scantile[tile];
                         tpix = t.pix;
-                        att = attrib[tile];
+                        att = attributes[tile];
                     } else {
                         // Fetch data:
                         t = ptTile[baseTile + nameTable[curNt].getTileIndex(cntHt, cntVt)];
                         tpix = t.pix;
                         att = nameTable[curNt].getAttrib(cntHt, cntVt);
                         scantile[tile] = t;
-                        attrib[tile] = att;
+                        attributes[tile] = att;
                     }
 
                     // Render tile scanline:
@@ -1547,8 +1547,8 @@ public class Ppu {
             short tmp = (short) buf.readInt();
 
             // Stuff used during rendering:
-            for (int i = 0; i < bgbuffer.length; i++) {
-                bgbuffer[i] = buf.readByte();
+            for (int i = 0; i < bgBuffer.length; i++) {
+                bgBuffer[i] = buf.readByte();
             }
             for (int i = 0; i < pixrendered.length; i++) {
                 pixrendered[i] = buf.readByte();
@@ -1635,11 +1635,11 @@ public class Ppu {
         // buf.putInt(tmp);
 
         // Stuff used during rendering:
-        for (int i = 0; i < bgbuffer.length; i++) {
-            buf.putByte((short) bgbuffer[i]);
+        for (int j : bgBuffer) {
+            buf.putByte((short) j);
         }
-        for (int i = 0; i < pixrendered.length; i++) {
-            buf.putByte((short) pixrendered[i]);
+        for (int j : pixrendered) {
+            buf.putByte((short) j);
         }
 
         // Name tables:

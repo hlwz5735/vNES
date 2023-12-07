@@ -27,7 +27,6 @@ import java.util.Arrays;
 import javax.swing.*;
 
 public class BufferView extends JPanel {
-
     // Scale modes:
     public static final int SCALE_NONE = 0;
     public static final int SCALE_HW2X = 1;
@@ -35,7 +34,9 @@ public class BufferView extends JPanel {
     public static final int SCALE_NORMAL = 3;
     public static final int SCALE_SCANLINE = 4;
     public static final int SCALE_RASTER = 5;
+
     protected Nes nes;
+
     private BufferedImage img;
     private VolatileImage vimg;
     private boolean usingMenu = false;

@@ -23,7 +23,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ScreenView extends BufferView {
-
     private MyMouseAdapter mouse;
     private boolean notifyImageReady;
 
@@ -32,17 +31,14 @@ public class ScreenView extends BufferView {
     }
 
     public void init() {
-
         if (mouse == null) {
             mouse = new MyMouseAdapter();
             this.addMouseListener(mouse);
         }
         super.init();
-
     }
 
     private class MyMouseAdapter extends MouseAdapter {
-
         long lastClickTime = 0;
 
         public void mouseClicked(MouseEvent me) {
