@@ -53,7 +53,7 @@ public class NesPanel extends JPanel implements Runnable {
         Globals.memoryFlushValue = 0x00; // make SMB1 hacked version work.
 
         nes = manager.getNes();
-        nes.enableSound(sound);
+        nes.setSoundEnabled(sound);
         nes.reset();
     }
 
@@ -102,13 +102,13 @@ public class NesPanel extends JPanel implements Runnable {
 
         nes.loadRom(rom);
 
-        if (nes.rom.isValid()) {
+        if (nes.getRom().isValid()) {
             // Add the screen buffer:
             addScreenView();
 
             // Set some properties:
             Globals.timeEmulation = timeEmulation;
-            nes.ppu.setShowSoundBuffer(showSoundBuffer);
+            nes.getPpu().setShowSoundBuffer(showSoundBuffer);
 
             // Start emulation:
             // System.out.println("vNES is now starting the processor.");

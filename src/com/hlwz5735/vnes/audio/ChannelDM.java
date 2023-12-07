@@ -77,7 +77,7 @@ public class ChannelDM implements PapuChannel {
         }
 
         if (irqGenerated) {
-            papu.nes.cpu.requestIrq(Cpu.IRQ_NORMAL);
+            papu.nes.getCpu().requestIrq(Cpu.IRQ_NORMAL);
         }
     }
 
@@ -105,7 +105,7 @@ public class ChannelDM implements PapuChannel {
     private void nextSample() {
         // Fetch byte:
         data = papu.getNes().getMemoryMapper().load(playAddress);
-        papu.getNes().cpu.haltCycles(4);
+        papu.getNes().getCpu().haltCycles(4);
 
         playLengthCounter--;
         playAddress++;

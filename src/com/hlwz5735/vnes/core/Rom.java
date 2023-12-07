@@ -64,6 +64,7 @@ public class Rom {
     public static final int SINGLESCREEN_MIRRORING3 = 5;
     public static final int SINGLESCREEN_MIRRORING4 = 6;
     public static final int CHRROM_MIRRORING = 7;
+
     boolean failedSaveFile = false;
     boolean saveRamUpToDate = true;
     short[] header;
@@ -87,7 +88,6 @@ public class Rom {
     static boolean[] mapperSupported;
 
     static {
-
         mapperName = new String[255];
         mapperSupported = new boolean[255];
         for (int i = 0; i < 255; i++) {
@@ -213,17 +213,14 @@ public class Rom {
     }
 
     public void load(String fileName) {
-
         this.fileName = fileName;
         FileLoader loader = new FileLoader();
         short[] b = loader.loadFile(fileName, nes.getManager());
 
         if (b == null || b.length == 0) {
-
             // Unable to load file.
-            nes.manager.showErrorMsg("Unable to load ROM file.");
+            nes.getManager().showErrorMsg("Unable to load ROM file.");
             valid = false;
-
         }
 
         // Read header:
@@ -335,7 +332,6 @@ public class Rom {
         }*/
 
         valid = true;
-
     }
 
     public boolean isValid() {
@@ -368,7 +364,6 @@ public class Rom {
     }
 
     public int getMirroringType() {
-
         if (fourScreen) {
             return FOURSCREEN_MIRRORING;
         }
@@ -379,7 +374,6 @@ public class Rom {
 
         // default:
         return VERTICAL_MIRRORING;
-
     }
 
     public int getMapperType() {
@@ -387,13 +381,11 @@ public class Rom {
     }
 
     public String getMapperName() {
-
         if (mapperType >= 0 && mapperType < mapperName.length) {
             return mapperName[mapperType];
         }
         // else:
         return "Unknown Mapper, " + mapperType;
-
     }
 
     public boolean hasBatteryRam() {
@@ -420,121 +412,87 @@ public class Rom {
 
         if (mapperSupported()) {
             switch (mapperType) {
-
-                case 0: {
+                case 0:
                     return new MapperDefault();
-                }
-                case 1: {
+                case 1:
                     return new Mapper001();
-                }
-                case 2: {
+                case 2:
                     return new Mapper002();
-                }
-                case 3: {
+                case 3:
                     return new Mapper003();
-                }
-                case 4: {
+                case 4:
                     return new Mapper004();
-                }
-                case 7: {
+                case 7:
                     return new Mapper007();
-                }
-                case 9: {
+                case 9:
                     return new Mapper009();
-                }
-                case 10: {
+                case 10:
                     return new Mapper010();
-                }
-                case 11: {
+                case 11:
                     return new Mapper011();
-                }
-                case 15: {
+                case 15:
                     return new Mapper015();
-                }
-                case 18: {
+                case 18:
                     return new Mapper018();
-                }
-                case 21: {
+                case 21:
                     return new Mapper021();
-                }
-                case 22: {
+                case 22:
                     return new Mapper022();
-                }
-                case 23: {
+                case 23:
                     return new Mapper023();
-                }
-                case 32: {
+                case 32:
                     return new Mapper032();
-                }
-                case 33: {
+                case 33:
                     return new Mapper033();
-                }
-                case 34: {
+                case 34:
                     return new Mapper034();
-                }
-                case 48: {
+                case 48:
                     return new Mapper048();
-                }
-                case 64: {
+                case 64:
                     return new Mapper064();
-                }
-                case 66: {
+                case 66:
                     return new Mapper066();
-                }
-                case 68: {
+                case 68:
                     return new Mapper068();
-                }
-                case 71: {
+                case 71:
                     return new Mapper071();
-                }
-                case 72: {
+                case 72:
                     return new Mapper072();
-                }
-                case 75: {
+                case 75:
                     return new Mapper075();
-                }
-                case 78: {
+                case 78:
                     return new Mapper078();
-                }
-                case 79: {
+                case 79:
                     return new Mapper079();
-                }
-                case 87: {
+                case 87:
                     return new Mapper087();
-                }
-                case 94: {
+                case 94:
                     return new Mapper094();
-                }
-                case 105: {
+                case 105:
                     return new Mapper105();
-                }
-                case 140: {
+                case 140:
                     return new Mapper140();
-                }
-                case 182: {
+                case 182:
                     return new Mapper182();
-                }
-
+                default:
+                    throw new IllegalStateException("Unexpected value: " + mapperType);
             }
         }
 
         // If the mapper wasn't supported, create the standard one:
-        nes.manager.showErrorMsg("Warning: Mapper not supported yet.");
+        nes.getManager().showErrorMsg("Warning: Mapper not supported yet.");
         return new MapperDefault();
-
     }
 
     public void setSaveState(boolean enableSave) {
-        // this.enableSave = enableSave;
-        if (enableSave && !batteryRam) {
+        this.enableSave = enableSave;
+        // if (enableSave && !batteryRam) {
 //          loadBatteryRam();
-        }
+//         }
     }
 
     public short[] getBatteryRam() {
-
         return saveRam;
-
     }
 
     /*
@@ -571,7 +529,6 @@ public class Rom {
 //                if (nes.getMemoryMapper() != null) {
 //                    nes.getMemoryMapper().loadBatteryRam();
 //                }
-//
 //            } catch (Exception e) {
 //                //System.out.println("Unable to get battery RAM from user.");
 //                failedSaveFile = true;
@@ -580,7 +537,6 @@ public class Rom {
 //    }
 
 //    public void writeBatteryRam(int address, short value) {
-//
 //        if (!failedSaveFile && !batteryRam && enableSave) {
 //            loadBatteryRam();
 //        }
@@ -590,14 +546,11 @@ public class Rom {
 //            saveRam[address - 0x6000] = value;
 //            saveRamUpToDate = false;
 //        }
-//
 //    }
 
 //    public void closeRom() {
-//
 //        if (batteryRam && !saveRamUpToDate) {
 //            try {
-//
 //                // Convert bytes to hex-encoded memory string:
 //                StringBuilder sb = new StringBuilder(saveRam.length * 2 + saveRam.length / 38);
 //                for (int i = 0; i < saveRam.length; i++) {
@@ -615,15 +568,11 @@ public class Rom {
 //
 //                saveRamUpToDate = true;
 //                //System.out.println("Battery RAM sent to user.");
-//
 //            } catch (Exception e) {
-//
 //                //System.out.println("Trouble sending battery RAM to user.");
 //                e.printStackTrace();
-//
 //            }
 //        }
-//
 //    }
 
     public void destroy() {

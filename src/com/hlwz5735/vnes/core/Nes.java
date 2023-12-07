@@ -25,24 +25,22 @@ import com.hlwz5735.vnes.gui.NesManager;
 import com.hlwz5735.vnes.input.InputHandler;
 
 public class Nes {
-
-    public NesManager manager;
-    public Cpu cpu;
-    public Ppu ppu;
-    public Papu papu;
-    public Memory cpuMem;
-    public Memory ppuMem;
-    public Memory sprMem;
-    public MemoryMapper memMapper;
-    public PaletteTable palTable;
-    public Rom rom;
-    int cc;
-    public String romFile;
-    boolean isRunning = false;
+    private NesManager manager;
+    private Cpu cpu;
+    private Ppu ppu;
+    private Papu papu;
+    private Memory cpuMem;
+    private Memory ppuMem;
+    private Memory sprMem;
+    private MemoryMapper memMapper;
+    private PaletteTable palTable;
+    private Rom rom;
+    private int cc;
+    private String romFile;
+    private boolean isRunning = false;
 
     // Creates the NES system.
     public Nes(NesManager manager) {
-
         Globals.nes = this;
         this.manager = manager;
 
@@ -50,7 +48,6 @@ public class Nes {
         cpuMem = new Memory(this, 0x10000);    // Main memory (internal to CPU)
         ppuMem = new Memory(this, 0x8000);    // VRAM memory (internal to PPU)
         sprMem = new Memory(this, 0x100);    // Sprite RAM  (internal to PPU)
-
 
         // Create system units:
         cpu = new Cpu(this);
@@ -78,15 +75,13 @@ public class Nes {
         ppu.init();
 
         // Enable sound:
-        enableSound(true);
+        setSoundEnabled(true);
 
         // Clear CPU memory:
         clearCPUMemory();
-
     }
 
     public boolean stateLoad(ByteBuffer buf) {
-
         boolean continueEmulation = false;
         boolean success;
 
@@ -98,7 +93,6 @@ public class Nes {
 
         // Check version:
         if (buf.readByte() == 1) {
-
             // Let units load their state from the buffer:
             cpuMem.stateLoad(buf);
             ppuMem.stateLoad(buf);
@@ -107,12 +101,9 @@ public class Nes {
             memMapper.stateLoad(buf);
             ppu.stateLoad(buf);
             success = true;
-
         } else {
-
             // System.out.println("State file has wrong format. version="+buf.readByte(0));
             success = false;
-
         }
 
         // Continue emulation:
@@ -121,11 +112,9 @@ public class Nes {
         }
 
         return success;
-
     }
 
     public void stateSave(ByteBuffer buf) {
-
         boolean continueEmulation = isRunning();
         stopEmulation();
 
@@ -144,17 +133,13 @@ public class Nes {
         if (continueEmulation) {
             startEmulation();
         }
-
     }
 
     public boolean isRunning() {
-
         return isRunning;
-
     }
 
     public void startEmulation() {
-
         if (Globals.enableSound && !papu.isRunning()) {
             papu.start();
         }
@@ -186,19 +171,19 @@ public class Nes {
     }
 
     public void clearCPUMemory() {
+        final short[] mem = cpuMem.getMem();
+        final short flushval = Globals.memoryFlushValue;
 
-        short flushval = Globals.memoryFlushValue;
         for (int i = 0; i < 0x2000; i++) {
-            cpuMem.mem[i] = flushval;
+            mem[i] = flushval;
         }
         for (int p = 0; p < 4; p++) {
             int i = p * 0x800;
-            cpuMem.mem[i + 0x008] = 0xF7;
-            cpuMem.mem[i + 0x009] = 0xEF;
-            cpuMem.mem[i + 0x00A] = 0xDF;
-            cpuMem.mem[i + 0x00F] = 0xBF;
+            mem[i + 0x008] = 0xF7;
+            mem[i + 0x009] = 0xEF;
+            mem[i + 0x00A] = 0xDF;
+            mem[i + 0x00F] = 0xBF;
         }
-
     }
 
     public void setGameGenieState(boolean enable) {
@@ -255,42 +240,33 @@ public class Nes {
     // Loads a ROM file into the CPU and PPU.
     // The ROM file is validated first.
     public boolean loadRom(String file) {
-
         // Can't load ROM while still running.
         if (isRunning) {
             stopEmulation();
         }
 
-        {
-            // Load ROM file:
+        // Load ROM file:
+        rom = new Rom(this);
+        rom.load(file);
+        if (rom.isValid()) {
+            // The CPU will load
+            // the ROM into the CPU
+            // and PPU memory.
+            reset();
 
-            rom = new Rom(this);
-            rom.load(file);
-            if (rom.isValid()) {
+            memMapper = rom.createMapper();
+            memMapper.init(this);
+            cpu.setMapper(memMapper);
+            memMapper.loadROM(rom);
+            ppu.setMirroring(rom.getMirroringType());
 
-                // The CPU will load
-                // the ROM into the CPU
-                // and PPU memory.
-
-                reset();
-
-                memMapper = rom.createMapper();
-                memMapper.init(this);
-                cpu.setMapper(memMapper);
-                memMapper.loadROM(rom);
-                ppu.setMirroring(rom.getMirroringType());
-
-                this.romFile = file;
-
-            }
-            return rom.isValid();
+            this.romFile = file;
         }
-
+        return rom.isValid();
     }
 
     // Resets the system.
     public void reset() {
-
         if (rom != null) {
 //            rom.closeRom();
         }
@@ -314,12 +290,12 @@ public class Nes {
         if (joy1 != null) {
             joy1.reset();
         }
-
     }
 
-    // Enable or disable sound playback.
-    public void enableSound(boolean enable) {
-
+    /**
+     * 设置是否启用声音
+     */
+    public void setSoundEnabled(boolean enable) {
         boolean wasRunning = isRunning();
         if (wasRunning) {
             stopEmulation();
@@ -337,13 +313,16 @@ public class Nes {
         if (wasRunning) {
             startEmulation();
         }
-
     }
 
     public void setFramerate(int rate) {
         Globals.preferredFrameRate = rate;
         Globals.frameTime = 1000000 / rate;
         papu.setSampleRate(papu.getSampleRate(), false);
+    }
+
+    public PaletteTable getPalTable() {
+        return palTable;
     }
 
     public void destroy() {
@@ -355,15 +334,6 @@ public class Nes {
         }
         if (papu != null) {
             papu.destroy();
-        }
-        if (cpuMem != null) {
-            cpuMem.destroy();
-        }
-        if (ppuMem != null) {
-            ppuMem.destroy();
-        }
-        if (sprMem != null) {
-            sprMem.destroy();
         }
         if (memMapper != null) {
             memMapper.destroy();

@@ -17,6 +17,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.gui;
 
+import com.hlwz5735.vnes.audio.Papu;
 import com.hlwz5735.vnes.core.Nes;
 import com.hlwz5735.vnes.common.Globals;
 import com.hlwz5735.vnes.core.HiResTimer;
@@ -75,18 +76,17 @@ public class NesManager {
         // Sound stuff:
         int tmp = nes.getPapu().getBufferIndex();
         if (Globals.enableSound && Globals.timeEmulation && tmp > 0) {
-
-            int min_avail = nes.getPapu().getLine().getBufferSize() - 4 * tmp;
-
-            long timeToSleep = nes.papu.getMillisToAvailableAbove(min_avail);
+            final Papu papu = nes.getPapu();
+            int min_avail = papu.getLine().getBufferSize() - 4 * tmp;
+            long timeToSleep = papu.getMillisToAvailableAbove(min_avail);
             do {
                 try {
                     Thread.sleep(timeToSleep);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
-            } while ((timeToSleep = nes.papu.getMillisToAvailableAbove(min_avail)) > 0);
+            } while ((timeToSleep = papu.getMillisToAvailableAbove(min_avail)) > 0);
 
-            nes.getPapu().writeBuffer();
+            papu.writeBuffer();
         }
 
         // Sleep a bit if sound is disabled:

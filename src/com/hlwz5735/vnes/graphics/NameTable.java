@@ -19,16 +19,26 @@ package com.hlwz5735.vnes.graphics;
 
 import com.hlwz5735.vnes.core.ByteBuffer;
 
+/**
+ * 命名查找表
+ */
 public class NameTable {
+    /** 命名表的名称 */
+    private final String name;
 
-    String name;
-    short[] tile;
-    short[] attrib;
-    int width;
-    int height;
+    /** 图块列表 */
+    private final short[] tile;
+
+    /** 图块的属性列表 */
+    private final short[] attrib;
+
+    /** 宽度 */
+    private final int width;
+
+    /** 高度 */
+    private final int height;
 
     public NameTable(int width, int height, String name) {
-
         this.name = name;
 
         this.width = width;
@@ -36,29 +46,25 @@ public class NameTable {
 
         tile = new short[width * height];
         attrib = new short[width * height];
-
     }
 
+    /** 根据坐标获取对应的图块号 */
     public short getTileIndex(int x, int y) {
-
         return tile[y * width + x];
-
     }
 
+    /** 根据坐标获取对应的属性 */
     public short getAttrib(int x, int y) {
-
         return attrib[y * width + x];
-
     }
 
+    /** 写入图块序号信息 */
     public void writeTileIndex(int index, int value) {
-
         tile[index] = (short) value;
-
     }
 
+    /** 写入属性信息 */
     public void writeAttrib(int index, int value) {
-
         int basex, basey;
         int add;
         int tx, ty;
@@ -82,31 +88,30 @@ public class NameTable {
                 }
             }
         }
-
     }
 
     public void stateSave(ByteBuffer buf) {
-
         for (int i = 0; i < width * height; i++) {
-            if (tile[i] > 255)// System.out.println(">255!!");
-            {
-                buf.putByte((byte) tile[i]);
+            if (tile[i] > 255) {
+                System.out.println(">255!!");
             }
+            buf.putByte((byte) tile[i]);
         }
         for (int i = 0; i < width * height; i++) {
             buf.putByte((byte) attrib[i]);
         }
-
     }
 
     public void stateLoad(ByteBuffer buf) {
-
         for (int i = 0; i < width * height; i++) {
             tile[i] = buf.readByte();
         }
         for (int i = 0; i < width * height; i++) {
             attrib[i] = buf.readByte();
         }
+    }
 
+    public String getName() {
+        return name;
     }
 }

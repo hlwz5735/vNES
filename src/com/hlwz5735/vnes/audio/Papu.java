@@ -406,7 +406,7 @@ public final class Papu {
 
         // Frame IRQ handling:
         if (frameIrqEnabled && frameIrqActive) {
-            nes.cpu.requestIrq(Cpu.IRQ_NORMAL);
+            nes.getCpu().requestIrq(Cpu.IRQ_NORMAL);
         }
 
         // Clock frame counter at double CPU speed:

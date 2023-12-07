@@ -18,6 +18,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.hlwz5735.vnes.gui;
 
 import com.hlwz5735.vnes.core.Nes;
+import com.hlwz5735.vnes.graphics.Ppu;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -54,13 +55,11 @@ public class BufferView extends JPanel {
 
     // Constructor
     public BufferView(Nes nes, int width, int height) {
-
         super(false);
         this.nes = nes;
         this.width = width;
         this.height = height;
         this.scaleMode = -1;
-
     }
 
     public void setBgColor(int color) {
@@ -68,9 +67,7 @@ public class BufferView extends JPanel {
     }
 
     public void setScaleMode(int newMode) {
-
         if (newMode != scaleMode) {
-
             // Check differences:
             boolean diffHW = useHWScaling(newMode) != useHWScaling(scaleMode);
             boolean diffSz = getScaleModeScale(newMode) != getScaleModeScale(scaleMode);
@@ -79,33 +76,23 @@ public class BufferView extends JPanel {
             this.scaleMode = newMode;
 
             if (diffHW || diffSz) {
-
                 // Create new view:
                 createView();
-
             }
-
         }
-
     }
 
     public void init() {
-
         setScaleMode(SCALE_NONE);
-
     }
 
     private void createView() {
-
         int scale = getScaleModeScale(scaleMode);
 
         if (!useHWScaling(scaleMode)) {
-
             // Create new BufferedImage with scaled width & height:
             img = new BufferedImage(width * scale, height * scale, BufferedImage.TYPE_INT_RGB);
-
         } else {
-
             // Create new BufferedImage with normal width & height:
             img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
@@ -113,55 +100,41 @@ public class BufferView extends JPanel {
             gfx = img.createGraphics();
             gfx.setFont(fpsFont);
 
-
             // Set rendering hints:
             Graphics2D g2d = (Graphics2D) gfx;
             g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
             try {
-
                 // Create hardware accellerated image:
                 vimg = createVolatileImage(width, height, new ImageCapabilities(true));
-
             } catch (Exception e) {
-
                 // Unable to create image. Fall back to software scaling:
                 // System.out.println("Unable to create HW accellerated image.");
                 scaleMode = SCALE_NORMAL;
                 img = new BufferedImage(width * scale, height * scale, BufferedImage.TYPE_INT_RGB);
-
             }
-
         }
-
 
         // Create graphics object to use for FPS display:
         gfx = img.createGraphics();
         gfx.setFont(fpsFont);
-
 
         // Set rendering hints:
         Graphics2D g2d = (Graphics2D) gfx;
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
-
         // Retrieve raster from image:
         DataBufferInt dbi = (DataBufferInt) img.getRaster().getDataBuffer();
         int[] raster = dbi.getData();
 
-
         // Replace current rasters with the one used by the image:
         if (scaleMode == SCALE_NONE || scaleMode == SCALE_HW2X || scaleMode == SCALE_HW3X) {
-
             pix = raster;
-            nes.ppu.setBuffer(raster);
-
+            nes.getPpu().setBuffer(raster);
         } else {
-
             pix_scaled = raster;
-
         }
 
         // Set background color:
@@ -171,7 +144,6 @@ public class BufferView extends JPanel {
         setSize(width * scale, height * scale);
         setBounds(getX(), getY(), width * scale, height * scale);
 
-
         // Repaint component:
         this.invalidate();
         repaint();
@@ -180,17 +152,18 @@ public class BufferView extends JPanel {
     public void imageReady(boolean skipFrame) {
         // Skip image drawing if minimized or frameskipping:
         if (!skipFrame) {
+            Ppu ppu = nes.getPpu();
             if (scaleMode != SCALE_NONE) {
                 if (scaleMode == SCALE_NORMAL) {
-                    Scale.doNormalScaling(pix, pix_scaled, nes.ppu.getScanlineChanged());
+                    Scale.doNormalScaling(pix, pix_scaled, ppu.getScanlineChanged());
                 } else if (scaleMode == SCALE_SCANLINE) {
-                    Scale.doScanlineScaling(pix, pix_scaled, nes.ppu.getScanlineChanged());
+                    Scale.doScanlineScaling(pix, pix_scaled, ppu.getScanlineChanged());
                 } else if (scaleMode == SCALE_RASTER) {
-                    Scale.doRasterScaling(pix, pix_scaled, nes.ppu.getScanlineChanged());
+                    Scale.doRasterScaling(pix, pix_scaled, ppu.getScanlineChanged());
                 }
             }
 
-            nes.ppu.setRequestRenderAll(false);
+            ppu.setRequestRenderAll(false);
             paint(getGraphics());
         }
     }
@@ -219,94 +192,67 @@ public class BufferView extends JPanel {
     }
 
     public void paint(Graphics g) {
-
         // Skip if not needed:
         if (usingMenu) {
             return;
         }
 
         if (scaleMode != SCALE_NONE) {
-
             // Scaled drawing:
             paintFPS(0, 14, g);
-            paint_scaled(g);
-
+            paintScaled(g);
         } else if (img != null && g != null) {
-
             // Normal draw:
             paintFPS(0, 14, g);
             g.drawImage(img, 0, 0, null);
-
         }
-
     }
 
-    public void paint_scaled(Graphics g) {
-
+    public void paintScaled(Graphics g) {
         // Skip if not needed:
         if (usingMenu) {
             return;
         }
 
         if (scaleMode == SCALE_HW2X) {
-
             // 2X Hardware accellerated scaling.
             if (g != null && img != null && vimg != null) {
-
                 // Draw BufferedImage into accellerated image:
                 vimg.getGraphics().drawImage(img, 0, 0, null);
-
                 // Draw accellerated image scaled:
                 g.drawImage(vimg, 0, 0, width * 2, height * 2, null);
-
             }
-
         } else if (scaleMode == SCALE_HW3X) {
-
             // 3X Hardware accellerated scaling.
             if (g != null && img != null && vimg != null) {
-
                 // Draw BufferedImage into accellerated image:
                 vimg.getGraphics().drawImage(img, 0, 0, null);
-
                 // Draw accellerated image scaled:
                 g.drawImage(vimg, 0, 0, width * 3, height * 3, null);
-
             }
-
         } else {
-
             // 2X Software scaling.
             if (g != null && img != null) {
-
                 // Draw big BufferedImage directly:
                 g.drawImage(img, 0, 0, width * 2, height * 2, null);
-
             }
-
         }
-
     }
 
     public void setFPSEnabled(boolean val) {
-
         // Whether to show FPS count.
         showFPS = val;
-
     }
 
     public void paintFPS(int x, int y, Graphics g) {
-
         // Skip if not needed:
         if (usingMenu) {
             return;
         }
 
         if (showFPS) {
-
             // Update FPS count:
             if (--fpsCounter <= 0) {
-
                 long ct = nes.getManager().getTimer().currentMicros();
                 long frameT = (ct - prevFrameTime) / 45;
                 if (frameT == 0) {
@@ -316,7 +262,6 @@ public class BufferView extends JPanel {
                 }
                 fpsCounter = 45;
                 prevFrameTime = ct;
-
             }
 
             // Draw FPS.
@@ -324,9 +269,7 @@ public class BufferView extends JPanel {
             gfx.fillRect(x, y - gfx.getFontMetrics().getAscent(), gfx.getFontMetrics().stringWidth(fps) + 3, gfx.getFontMetrics().getHeight());
             gfx.setColor(Color.cyan);
             gfx.drawString(fps, x, y);
-
         }
-
     }
 
     public int getBufferWidth() {
@@ -362,9 +305,7 @@ public class BufferView extends JPanel {
     }
 
     public void destroy() {
-
         nes = null;
         img = null;
-
     }
 }

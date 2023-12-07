@@ -29,8 +29,6 @@ import com.hlwz5735.vnes.graphics.Ppu;
 import com.hlwz5735.vnes.util.Misc;
 
 public final class Cpu implements Runnable {
-
-
     // Thread:
     Thread myThread;
 
@@ -82,7 +80,6 @@ public final class Cpu implements Runnable {
 
     // Initialize:
     public void init() {
-
         // Get Op data:
         opdata = CpuInfo.getOpData();
 
@@ -97,11 +94,9 @@ public final class Cpu implements Runnable {
         F_NOTUSED_NEW = 1;
         F_INTERRUPT_NEW = 1;
         irqRequested = false;
-
     }
 
     public void stateLoad(ByteBuffer buf) {
-
         if (buf.readByte() == 1) {
             // Version 1
 
@@ -115,13 +110,10 @@ public final class Cpu implements Runnable {
 
             // Cycles to halt:
             cyclesToHalt = buf.readInt();
-
         }
-
     }
 
     public void stateSave(ByteBuffer buf) {
-
         // Save info version:
         buf.putByte((short) 1);
 
@@ -135,11 +127,9 @@ public final class Cpu implements Runnable {
 
         // Cycles to halt:
         buf.putInt(cyclesToHalt);
-
     }
 
     public void reset() {
-
         REG_ACC_NEW = 0;
         REG_X_NEW = 0;
         REG_Y_NEW = 0;
@@ -172,12 +162,9 @@ public final class Cpu implements Runnable {
         F_BRK_NEW = 1;
 
         cyclesToHalt = 0;
-
-
     }
 
     public synchronized void beginExecution() {
-
         if (myThread != null && myThread.isAlive()) {
             endExecution();
         }
@@ -185,7 +172,6 @@ public final class Cpu implements Runnable {
         myThread = new Thread(this);
         myThread.start();
         myThread.setPriority(Thread.MIN_PRIORITY);
-
     }
 
     public synchronized void endExecution() {
@@ -194,7 +180,6 @@ public final class Cpu implements Runnable {
             try {
                 stopRunning = true;
                 myThread.join();
-
             } catch (InterruptedException ie) {
                 // System.out.println("** Unable to stop CPU thread!");
                 ie.printStackTrace();
@@ -208,6 +193,7 @@ public final class Cpu implements Runnable {
         return (myThread != null && myThread.isAlive());
     }
 
+    @Override
     public void run() {
         initRun();
         emulate();
@@ -217,21 +203,21 @@ public final class Cpu implements Runnable {
         stopRunning = false;
     }
 
-    // Emulates cpu instructions until stopped.
+    /**
+     * 执行CPU模拟动作
+     * 在收到停止条件之前会一直执行下去
+     */
     public void emulate() {
-
-
         // NES Memory
         // (when memory mappers switch ROM banks
         // this will be written to, no need to
         // update reference):
-        mem = nes.cpuMem.mem;
+        this.mem = nes.getCpuMemory().getMem();
 
         // References to other parts of NES:
-        MemoryMapper mmap = nes.memMapper;
-        Ppu ppu = nes.ppu;
-        Papu papu = nes.papu;
-
+        final MemoryMapper mmap = nes.getMemoryMapper();
+        final Ppu ppu = nes.getPpu();
+        final Papu papu = nes.getPapu();
 
         // Registers:
         int REG_ACC = REG_ACC_NEW;
@@ -249,7 +235,6 @@ public final class Cpu implements Runnable {
         int F_BRK = F_BRK_NEW;
         int F_OVERFLOW = F_OVERFLOW_NEW;
         int F_SIGN = F_SIGN_NEW;
-
 
         // Misc. variables
         int opinf = 0;
@@ -270,14 +255,14 @@ public final class Cpu implements Runnable {
         while (!stopRunning) {
             // Check interrupts:
             if (irqRequested) {
-                temp = (F_CARRY) |
-                                ((F_ZERO == 0 ? 1 : 0) << 1) |
-                                (F_INTERRUPT << 2) |
-                                (F_DECIMAL << 3) |
-                                (F_BRK << 4) |
-                                (F_NOTUSED << 5) |
-                                (F_OVERFLOW << 6) |
-                                (F_SIGN << 7);
+                temp = (F_CARRY)
+                        | ((F_ZERO == 0 ? 1 : 0) << 1)
+                        | (F_INTERRUPT << 2)
+                        | (F_DECIMAL << 3)
+                        | (F_BRK << 4)
+                        | (F_NOTUSED << 5)
+                        | (F_OVERFLOW << 6)
+                        | (F_SIGN << 7);
 
                 REG_PC_NEW = REG_PC;
                 F_INTERRUPT_NEW = F_INTERRUPT;
@@ -308,7 +293,6 @@ public final class Cpu implements Runnable {
                 F_INTERRUPT = F_INTERRUPT_NEW;
                 F_BRK = F_BRK_NEW;
                 irqRequested = false;
-
             }
 
             opinf = opdata[mmap.load(REG_PC + 1)];
@@ -321,7 +305,6 @@ public final class Cpu implements Runnable {
             // Increment PC by number of op bytes:
             opaddr = REG_PC;
             REG_PC += ((opinf >> 16) & 0xFF);
-
 
             switch (addrMode) {
                 case 0: {
@@ -345,39 +328,33 @@ public final class Cpu implements Runnable {
                 }
                 case 3: {
                     // Absolute mode. Use the two bytes following the opcode as an address.
-
                     addr = load16bit(opaddr + 2);
                     break;
                 }
                 case 4: {
                     // Accumulator mode. The address is in the accumulator register.
-
                     addr = REG_ACC;
                     break;
                 }
                 case 5: {
                     // Immediate mode. The value is given after the opcode.
-
                     addr = REG_PC;
                     break;
                 }
                 case 6: {
                     // Zero Page Indexed mode, X as index. Use the address given after the opcode, then add the
                     // X register to it to get the final address.
-
                     addr = (load(opaddr + 2) + REG_X) & 0xFF;
                     break;
                 }
                 case 7: {
                     // Zero Page Indexed mode, Y as index. Use the address given after the opcode, then add the
                     // Y register to it to get the final address.
-
                     addr = (load(opaddr + 2) + REG_Y) & 0xFF;
                     break;
                 }
                 case 8: {
                     // Absolute Indexed Mode, X as index. Same as zero page indexed, but with the high byte.
-
                     addr = load16bit(opaddr + 2);
                     if ((addr & 0xFF00) != ((addr + REG_X) & 0xFF00)) {
                         cycleAdd = 1;
@@ -387,7 +364,6 @@ public final class Cpu implements Runnable {
                 }
                 case 9: {
                     // Absolute Indexed Mode, Y as index. Same as zero page indexed, but with the high byte.
-
                     addr = load16bit(opaddr + 2);
                     if ((addr & 0xFF00) != ((addr + REG_Y) & 0xFF00)) {
                         cycleAdd = 1;
@@ -398,7 +374,6 @@ public final class Cpu implements Runnable {
                 case 10: {
                     // Pre-indexed Indirect mode. Find the 16-bit address starting at the given location plus
                     // the current X register. The value is the contents of that address.
-
                     addr = load(opaddr + 2);
                     if ((addr & 0xFF00) != ((addr + REG_X) & 0xFF00)) {
                         cycleAdd = 1;
@@ -412,7 +387,6 @@ public final class Cpu implements Runnable {
                     // Post-indexed Indirect mode. Find the 16-bit address contained in the given location
                     // (and the one following). Add to that address the contents of the Y register. Fetch the value
                     // stored at that adress.
-
                     addr = load16bit(load(opaddr + 2));
                     if ((addr & 0xFF00) != ((addr + REG_Y) & 0xFF00)) {
                         cycleAdd = 1;
@@ -422,7 +396,6 @@ public final class Cpu implements Runnable {
                 }
                 case 12: {
                     // Indirect Absolute mode. Find the 16-bit address contained at the given location.
-
                     addr = load16bit(opaddr + 2);// Find op
                     if (addr < 0x1FFF) {
                         addr = mem[addr] + (mem[(addr & 0xFF00) | (((addr & 0xFF) + 1) & 0xFF)] << 8);// Read from address given in op
@@ -431,7 +404,6 @@ public final class Cpu implements Runnable {
                     }
                     break;
                 }
-
             }
 
             // Wrap around for addresses above 0xFFFF:
@@ -442,10 +414,8 @@ public final class Cpu implements Runnable {
             // ----------------------------------------------------------------------------------------------------
 
             // This should be compiled to a jump table.
-
             switch (opinf & 0xFF) {
                 case 0: {
-
                     // *******
                     // * ADC *
                     // *******
@@ -459,10 +429,8 @@ public final class Cpu implements Runnable {
                     REG_ACC = (temp & 255);
                     cycleCount += cycleAdd;
                     break;
-
                 }
                 case 1: {
-
                     // *******
                     // * AND *
                     // *******
@@ -474,37 +442,29 @@ public final class Cpu implements Runnable {
                     // REG_ACC = temp;
                     if (addrMode != 11) cycleCount += cycleAdd; // PostIdxInd = 11
                     break;
-
                 }
                 case 2: {
-
                     // *******
                     // * ASL *
                     // *******
 
                     // Shift left one bit
                     if (addrMode == 4) { // ADDR_ACC = 4
-
                         F_CARRY = (REG_ACC >> 7) & 1;
                         REG_ACC = (REG_ACC << 1) & 255;
                         F_SIGN = (REG_ACC >> 7) & 1;
                         F_ZERO = REG_ACC;
-
                     } else {
-
                         temp = load(addr);
                         F_CARRY = (temp >> 7) & 1;
                         temp = (temp << 1) & 255;
                         F_SIGN = (temp >> 7) & 1;
                         F_ZERO = temp;
                         write(addr, (short) temp);
-
                     }
                     break;
-
                 }
                 case 3: {
-
                     // *******
                     // * BCC *
                     // *******
@@ -515,10 +475,8 @@ public final class Cpu implements Runnable {
                         REG_PC = addr;
                     }
                     break;
-
                 }
                 case 4: {
-
                     // *******
                     // * BCS *
                     // *******
@@ -529,10 +487,8 @@ public final class Cpu implements Runnable {
                         REG_PC = addr;
                     }
                     break;
-
                 }
                 case 5: {
-
                     // *******
                     // * BEQ *
                     // *******
@@ -543,10 +499,8 @@ public final class Cpu implements Runnable {
                         REG_PC = addr;
                     }
                     break;
-
                 }
                 case 6: {
-
                     // *******
                     // * BIT *
                     // *******
@@ -557,10 +511,8 @@ public final class Cpu implements Runnable {
                     temp &= REG_ACC;
                     F_ZERO = temp;
                     break;
-
                 }
                 case 7: {
-
                     // *******
                     // * BMI *
                     // *******
@@ -571,10 +523,8 @@ public final class Cpu implements Runnable {
                         REG_PC = addr;
                     }
                     break;
-
                 }
                 case 8: {
-
                     // *******
                     // * BNE *
                     // *******
@@ -585,10 +535,8 @@ public final class Cpu implements Runnable {
                         REG_PC = addr;
                     }
                     break;
-
                 }
                 case 9: {
-
                     // *******
                     // * BPL *
                     // *******
@@ -599,10 +547,8 @@ public final class Cpu implements Runnable {
                         REG_PC = addr;
                     }
                     break;
-
                 }
                 case 10: {
-
                     // *******
                     // * BRK *
                     // *******
@@ -628,10 +574,8 @@ public final class Cpu implements Runnable {
                     REG_PC = load16bit(0xFFFE);
                     REG_PC--;
                     break;
-
                 }
                 case 11: {
-
                     // *******
                     // * BVC *
                     // *******
@@ -642,10 +586,8 @@ public final class Cpu implements Runnable {
                         REG_PC = addr;
                     }
                     break;
-
                 }
                 case 12: {
-
                     // *******
                     // * BVS *
                     // *******
@@ -656,10 +598,8 @@ public final class Cpu implements Runnable {
                         REG_PC = addr;
                     }
                     break;
-
                 }
                 case 13: {
-
                     // *******
                     // * CLC *
                     // *******
@@ -667,10 +607,8 @@ public final class Cpu implements Runnable {
                     // Clear carry flag
                     F_CARRY = 0;
                     break;
-
                 }
                 case 14: {
-
                     // *******
                     // * CLD *
                     // *******
@@ -678,10 +616,8 @@ public final class Cpu implements Runnable {
                     // Clear decimal flag
                     F_DECIMAL = 0;
                     break;
-
                 }
                 case 15: {
-
                     // *******
                     // * CLI *
                     // *******
@@ -689,10 +625,8 @@ public final class Cpu implements Runnable {
                     // Clear interrupt flag
                     F_INTERRUPT = 0;
                     break;
-
                 }
                 case 16: {
-
                     // *******
                     // * CLV *
                     // *******
@@ -700,10 +634,8 @@ public final class Cpu implements Runnable {
                     // Clear overflow flag
                     F_OVERFLOW = 0;
                     break;
-
                 }
                 case 17: {
-
                     // *******
                     // * CMP *
                     // *******
@@ -715,10 +647,8 @@ public final class Cpu implements Runnable {
                     F_ZERO = temp & 0xFF;
                     cycleCount += cycleAdd;
                     break;
-
                 }
                 case 18: {
-
                     // *******
                     // * CPX *
                     // *******
@@ -729,10 +659,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (temp >> 7) & 1;
                     F_ZERO = temp & 0xFF;
                     break;
-
                 }
                 case 19: {
-
                     // *******
                     // * CPY *
                     // *******
@@ -743,10 +671,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (temp >> 7) & 1;
                     F_ZERO = temp & 0xFF;
                     break;
-
                 }
                 case 20: {
-
                     // *******
                     // * DEC *
                     // *******
@@ -757,10 +683,8 @@ public final class Cpu implements Runnable {
                     F_ZERO = temp;
                     write(addr, (short) temp);
                     break;
-
                 }
                 case 21: {
-
                     // *******
                     // * DEX *
                     // *******
@@ -770,10 +694,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_X >> 7) & 1;
                     F_ZERO = REG_X;
                     break;
-
                 }
                 case 22: {
-
                     // *******
                     // * DEY *
                     // *******
@@ -783,10 +705,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_Y >> 7) & 1;
                     F_ZERO = REG_Y;
                     break;
-
                 }
                 case 23: {
-
                     // *******
                     // * EOR *
                     // *******
@@ -797,10 +717,8 @@ public final class Cpu implements Runnable {
                     F_ZERO = REG_ACC;
                     cycleCount += cycleAdd;
                     break;
-
                 }
                 case 24: {
-
                     // *******
                     // * INC *
                     // *******
@@ -811,10 +729,8 @@ public final class Cpu implements Runnable {
                     F_ZERO = temp;
                     write(addr, (short) (temp & 0xFF));
                     break;
-
                 }
                 case 25: {
-
                     // *******
                     // * INX *
                     // *******
@@ -824,10 +740,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_X >> 7) & 1;
                     F_ZERO = REG_X;
                     break;
-
                 }
                 case 26: {
-
                     // *******
                     // * INY *
                     // *******
@@ -838,10 +752,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_Y >> 7) & 1;
                     F_ZERO = REG_Y;
                     break;
-
                 }
                 case 27: {
-
                     // *******
                     // * JMP *
                     // *******
@@ -849,10 +761,8 @@ public final class Cpu implements Runnable {
                     // Jump to new location:
                     REG_PC = addr - 1;
                     break;
-
                 }
                 case 28: {
-
                     // *******
                     // * JSR *
                     // *******
@@ -863,10 +773,8 @@ public final class Cpu implements Runnable {
                     push(REG_PC & 255);
                     REG_PC = addr - 1;
                     break;
-
                 }
                 case 29: {
-
                     // *******
                     // * LDA *
                     // *******
@@ -877,10 +785,8 @@ public final class Cpu implements Runnable {
                     F_ZERO = REG_ACC;
                     cycleCount += cycleAdd;
                     break;
-
                 }
                 case 30: {
-
                     // *******
                     // * LDX *
                     // *******
@@ -891,10 +797,8 @@ public final class Cpu implements Runnable {
                     F_ZERO = REG_X;
                     cycleCount += cycleAdd;
                     break;
-
                 }
                 case 31: {
-
                     // *******
                     // * LDY *
                     // *******
@@ -905,37 +809,29 @@ public final class Cpu implements Runnable {
                     F_ZERO = REG_Y;
                     cycleCount += cycleAdd;
                     break;
-
                 }
                 case 32: {
-
                     // *******
                     // * LSR *
                     // *******
 
                     // Shift right one bit:
                     if (addrMode == 4) { // ADDR_ACC
-
                         temp = (REG_ACC & 0xFF);
                         F_CARRY = temp & 1;
                         temp >>= 1;
                         REG_ACC = temp;
-
                     } else {
-
                         temp = load(addr) & 0xFF;
                         F_CARRY = temp & 1;
                         temp >>= 1;
                         write(addr, (short) temp);
-
                     }
                     F_SIGN = 0;
                     F_ZERO = temp;
                     break;
-
                 }
                 case 33: {
-
                     // *******
                     // * NOP *
                     // *******
@@ -943,10 +839,8 @@ public final class Cpu implements Runnable {
                     // No OPeration.
                     // Ignore.
                     break;
-
                 }
                 case 34: {
-
                     // *******
                     // * ORA *
                     // *******
@@ -958,10 +852,8 @@ public final class Cpu implements Runnable {
                     REG_ACC = temp;
                     if (addrMode != 11) cycleCount += cycleAdd; // PostIdxInd = 11
                     break;
-
                 }
                 case 35: {
-
                     // *******
                     // * PHA *
                     // *******
@@ -969,10 +861,8 @@ public final class Cpu implements Runnable {
                     // Push accumulator on stack
                     push(REG_ACC);
                     break;
-
                 }
                 case 36: {
-
                     // *******
                     // * PHP *
                     // *******
@@ -990,10 +880,8 @@ public final class Cpu implements Runnable {
                                     (F_SIGN << 7)
                     );
                     break;
-
                 }
                 case 37: {
-
                     // *******
                     // * PLA *
                     // *******
@@ -1003,10 +891,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_ACC >> 7) & 1;
                     F_ZERO = REG_ACC;
                     break;
-
                 }
                 case 38: {
-
                     // *******
                     // * PLP *
                     // *******
@@ -1024,73 +910,58 @@ public final class Cpu implements Runnable {
 
                     F_NOTUSED = 1;
                     break;
-
                 }
                 case 39: {
-
                     // *******
                     // * ROL *
                     // *******
 
                     // Rotate one bit left
                     if (addrMode == 4) { // ADDR_ACC = 4
-
                         temp = REG_ACC;
                         add = F_CARRY;
                         F_CARRY = (temp >> 7) & 1;
                         temp = ((temp << 1) & 0xFF) + add;
                         REG_ACC = temp;
-
                     } else {
-
                         temp = load(addr);
                         add = F_CARRY;
                         F_CARRY = (temp >> 7) & 1;
                         temp = ((temp << 1) & 0xFF) + add;
                         write(addr, (short) temp);
-
                     }
                     F_SIGN = (temp >> 7) & 1;
                     F_ZERO = temp;
                     break;
-
                 }
                 case 40: {
-
                     // *******
                     // * ROR *
                     // *******
 
                     // Rotate one bit right
                     if (addrMode == 4) { // ADDR_ACC = 4
-
                         add = F_CARRY << 7;
                         F_CARRY = REG_ACC & 1;
                         temp = (REG_ACC >> 1) + add;
                         REG_ACC = temp;
-
                     } else {
-
                         temp = load(addr);
                         add = F_CARRY << 7;
                         F_CARRY = temp & 1;
                         temp = (temp >> 1) + add;
                         write(addr, (short) temp);
-
                     }
                     F_SIGN = (temp >> 7) & 1;
                     F_ZERO = temp;
                     break;
-
                 }
                 case 41: {
-
                     // *******
                     // * RTI *
                     // *******
 
                     // Return from interrupt. Pull status and PC from stack.
-
                     temp = pull();
                     F_CARRY = (temp) & 1;
                     F_ZERO = ((temp >> 1) & 1) == 0 ? 1 : 0;
@@ -1109,16 +980,13 @@ public final class Cpu implements Runnable {
                     REG_PC--;
                     F_NOTUSED = 1;
                     break;
-
                 }
                 case 42: {
-
                     // *******
                     // * RTS *
                     // *******
 
                     // Return from subroutine. Pull PC from stack.
-
                     REG_PC = pull();
                     REG_PC += (pull() << 8);
 
@@ -1126,10 +994,8 @@ public final class Cpu implements Runnable {
                         return;
                     }
                     break;
-
                 }
                 case 43: {
-
                     // *******
                     // * SBC *
                     // *******
@@ -1140,12 +1006,12 @@ public final class Cpu implements Runnable {
                     F_OVERFLOW = ((((REG_ACC ^ temp) & 0x80) != 0 && ((REG_ACC ^ load(addr)) & 0x80) != 0) ? 1 : 0);
                     F_CARRY = (temp < 0 ? 0 : 1);
                     REG_ACC = (temp & 0xFF);
-                    if (addrMode != 11) cycleCount += cycleAdd; // PostIdxInd = 11
+                    if (addrMode != 11) {
+                        cycleCount += cycleAdd; // PostIdxInd = 11
+                    }
                     break;
-
                 }
                 case 44: {
-
                     // *******
                     // * SEC *
                     // *******
@@ -1153,10 +1019,8 @@ public final class Cpu implements Runnable {
                     // Set carry flag
                     F_CARRY = 1;
                     break;
-
                 }
                 case 45: {
-
                     // *******
                     // * SED *
                     // *******
@@ -1164,10 +1028,8 @@ public final class Cpu implements Runnable {
                     // Set decimal mode
                     F_DECIMAL = 1;
                     break;
-
                 }
                 case 46: {
-
                     // *******
                     // * SEI *
                     // *******
@@ -1175,10 +1037,8 @@ public final class Cpu implements Runnable {
                     // Set interrupt disable status
                     F_INTERRUPT = 1;
                     break;
-
                 }
                 case 47: {
-
                     // *******
                     // * STA *
                     // *******
@@ -1186,10 +1046,8 @@ public final class Cpu implements Runnable {
                     // Store accumulator in memory
                     write(addr, (short) REG_ACC);
                     break;
-
                 }
                 case 48: {
-
                     // *******
                     // * STX *
                     // *******
@@ -1197,10 +1055,8 @@ public final class Cpu implements Runnable {
                     // Store index X in memory
                     write(addr, (short) REG_X);
                     break;
-
                 }
                 case 49: {
-
                     // *******
                     // * STY *
                     // *******
@@ -1208,10 +1064,8 @@ public final class Cpu implements Runnable {
                     // Store index Y in memory:
                     write(addr, (short) REG_Y);
                     break;
-
                 }
                 case 50: {
-
                     // *******
                     // * TAX *
                     // *******
@@ -1221,10 +1075,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_ACC >> 7) & 1;
                     F_ZERO = REG_ACC;
                     break;
-
                 }
                 case 51: {
-
                     // *******
                     // * TAY *
                     // *******
@@ -1234,10 +1086,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_ACC >> 7) & 1;
                     F_ZERO = REG_ACC;
                     break;
-
                 }
                 case 52: {
-
                     // *******
                     // * TSX *
                     // *******
@@ -1247,10 +1097,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_SP >> 7) & 1;
                     F_ZERO = REG_X;
                     break;
-
                 }
                 case 53: {
-
                     // *******
                     // * TXA *
                     // *******
@@ -1260,10 +1108,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_X >> 7) & 1;
                     F_ZERO = REG_X;
                     break;
-
                 }
                 case 54: {
-
                     // *******
                     // * TXS *
                     // *******
@@ -1272,10 +1118,8 @@ public final class Cpu implements Runnable {
                     REG_SP = (REG_X + 0x0100);
                     stackWrap();
                     break;
-
                 }
                 case 55: {
-
                     // *******
                     // * TYA *
                     // *******
@@ -1285,10 +1129,8 @@ public final class Cpu implements Runnable {
                     F_SIGN = (REG_Y >> 7) & 1;
                     F_ZERO = REG_Y;
                     break;
-
                 }
                 default: {
-
                     // *******
                     // * ??? *
                     // *******
@@ -1297,12 +1139,11 @@ public final class Cpu implements Runnable {
                     if (!crash) {
                         crash = true;
                         stopRunning = true;
-                        nes.manager.showErrorMsg("Game crashed, invalid opcode at address $" + Misc.hex16(opaddr));
+                        nes.getManager()
+                                .showErrorMsg("Game crashed, invalid opcode at address $" + Misc.hex16(opaddr));
                     }
                     break;
-
                 }
-
             }// end of switch
 
             // ----------------------------------------------------------------------------------------------------
@@ -1342,7 +1183,6 @@ public final class Cpu implements Runnable {
         F_NOTUSED_NEW = F_NOTUSED;
         F_OVERFLOW_NEW = F_OVERFLOW;
         F_SIGN_NEW = F_SIGN;
-
     }
 
     private int load(int addr) {
@@ -1350,11 +1190,8 @@ public final class Cpu implements Runnable {
     }
 
     private int load16bit(int addr) {
-        return addr < 0x1FFF ?
-                mem[addr & 0x7FF] | (mem[(addr + 1) & 0x7FF] << 8)
-                :
-                mmap.load(addr) | (mmap.load(addr + 1) << 8)
-                ;
+        return addr < 0x1FFF ? mem[addr & 0x7FF] | (mem[(addr + 1) & 0x7FF] << 8)
+                : mmap.load(addr) | (mmap.load(addr + 1) << 8);
     }
 
     private void write(int addr, short val) {
@@ -1401,10 +1238,8 @@ public final class Cpu implements Runnable {
     }
 
     private void doNonMaskableInterrupt(int status) {
-
         int temp = mmap.load(0x2000); // Read PPU status.
         if ((temp & 128) != 0) { // Check whether VBlank Interrupts are enabled
-
             REG_PC_NEW++;
             push((REG_PC_NEW >> 8) & 0xFF);
             push(REG_PC_NEW & 0xFF);
@@ -1413,21 +1248,15 @@ public final class Cpu implements Runnable {
 
             REG_PC_NEW = mmap.load(0xFFFA) | (mmap.load(0xFFFB) << 8);
             REG_PC_NEW--;
-
         }
-
-
     }
 
     private void doResetInterrupt() {
-
         REG_PC_NEW = mmap.load(0xFFFC) | (mmap.load(0xFFFD) << 8);
         REG_PC_NEW--;
-
     }
 
     private void doIrq(int status) {
-
         REG_PC_NEW++;
         push((REG_PC_NEW >> 8) & 0xFF);
         push(REG_PC_NEW & 0xFF);
@@ -1437,11 +1266,11 @@ public final class Cpu implements Runnable {
 
         REG_PC_NEW = mmap.load(0xFFFE) | (mmap.load(0xFFFF) << 8);
         REG_PC_NEW--;
-
     }
 
     private int getStatus() {
-        return (F_CARRY_NEW) | (F_ZERO_NEW << 1) | (F_INTERRUPT_NEW << 2) | (F_DECIMAL_NEW << 3) | (F_BRK_NEW << 4) | (F_NOTUSED_NEW << 5) | (F_OVERFLOW_NEW << 6) | (F_SIGN_NEW << 7);
+        return (F_CARRY_NEW) | (F_ZERO_NEW << 1) | (F_INTERRUPT_NEW << 2) | (F_DECIMAL_NEW << 3)
+                | (F_BRK_NEW << 4) | (F_NOTUSED_NEW << 5) | (F_OVERFLOW_NEW << 6) | (F_SIGN_NEW << 7);
     }
 
     private void setStatus(int st) {
@@ -1467,5 +1296,4 @@ public final class Cpu implements Runnable {
         nes = null;
         mmap = null;
     }
-
 }

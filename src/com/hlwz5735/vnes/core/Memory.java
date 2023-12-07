@@ -6,10 +6,9 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class Memory {
-
-    public short[] mem;
-    int memLength;
-    Nes nes;
+    private short[] mem;
+    private final int memLength;
+    private final Nes nes;
 
     public Memory(Nes nes, int byteCount) {
         this.nes = nes;
@@ -18,16 +17,14 @@ public class Memory {
     }
 
     public void stateLoad(ByteBuffer buf) {
-
-        if (mem == null) mem = new short[memLength];
+        if (mem == null) {
+            mem = new short[memLength];
+        }
         buf.readByteArray(mem);
-
     }
 
     public void stateSave(ByteBuffer buf) {
-
         buf.putByteArray(mem);
-
     }
 
     public void reset() {
@@ -51,46 +48,33 @@ public class Memory {
     }
 
     public void dump(String file, int offset, int length) {
-
         char[] ch = new char[length];
         for (int i = 0; i < length; i++) {
             ch[i] = (char) mem[offset + i];
         }
 
         try {
-
             File f = new File(file);
             FileWriter writer = new FileWriter(f);
             writer.write(ch);
             writer.close();
             // System.out.println("Memory dumped to file "+file+".");
-
         } catch (IOException ioe) {
             // System.out.println("Memory dump to file: IO Error!");
         }
-
-
     }
 
     public void write(int address, short[] array, int length) {
-
         if (address + length > mem.length) return;
         System.arraycopy(array, 0, mem, address, length);
-
     }
 
     public void write(int address, short[] array, int arrayoffset, int length) {
-
         if (address + length > mem.length) return;
         System.arraycopy(array, arrayoffset, mem, address, length);
-
     }
 
-    public void destroy() {
-
-        nes = null;
-        mem = null;
-
+    public short[] getMem() {
+        return mem;
     }
-
 }

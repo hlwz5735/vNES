@@ -17,8 +17,13 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.hlwz5735.vnes.graphics;
 
+/**
+ * 光栅化器
+ * 貌似目前没有用
+ */
 public class Raster {
 
+    // 图块数据
     public int[] data;
     public int width;
     public int height;
@@ -35,29 +40,32 @@ public class Raster {
         height = h;
     }
 
+    /**
+     * 将图块绘制到指定位置
+     * @param srcRaster 源光栅化器
+     * @param srcx 源X坐标
+     * @param srcy 源Y坐标
+     * @param dstx 目标X坐标
+     * @param dsty 目标Y坐标
+     * @param w 宽度
+     * @param h 高度
+     */
     public void drawTile(Raster srcRaster, int srcx, int srcy, int dstx, int dsty, int w, int h) {
-
         int[] src = srcRaster.data;
-        int src_index;
-        int dst_index;
+        int srcIdx;
+        int destIdx;
         int tmp;
 
         for (int y = 0; y < h; y++) {
-
-            src_index = (srcy + y) * srcRaster.width + srcx;
-            dst_index = (dsty + y) * width + dstx;
-
+            srcIdx = (srcy + y) * srcRaster.width + srcx;
+            destIdx = (dsty + y) * width + dstx;
             for (int x = 0; x < w; x++) {
-
-                if ((tmp = src[src_index]) != 0) {
-                    data[dst_index] = tmp;
+                if ((tmp = src[srcIdx]) != 0) {
+                    data[destIdx] = tmp;
                 }
-
-                src_index++;
-                dst_index++;
-
+                srcIdx++;
+                destIdx++;
             }
         }
-
     }
 }
